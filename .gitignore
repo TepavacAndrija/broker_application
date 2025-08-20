@@ -1,0 +1,21 @@
+# IDE
+.idea/
+*.iml
+*.iws
+
+# Build
+target/
+!target/.gitkeep
+
+# Spring
+*.log
+logs
+*.tmp
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
