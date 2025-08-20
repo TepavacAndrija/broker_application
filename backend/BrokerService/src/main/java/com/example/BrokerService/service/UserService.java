@@ -4,6 +4,7 @@ import com.example.BrokerService.model.User;
 import com.example.BrokerService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Optional<User> getUserById(UUID id) {
         return userRepository.findById(id);
@@ -28,6 +30,7 @@ public class UserService {
         user.setId(UUID.randomUUID());
         user.setName(userDTO.getName());
         user.setRole(userDTO.getRole());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         return userRepository.save(user);
     }
 
