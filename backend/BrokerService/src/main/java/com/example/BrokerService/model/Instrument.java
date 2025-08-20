@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-@Document(collection = "accounts")
+@Document(collection = "instruments")
 public class Instrument {
     @Id
     private UUID id;

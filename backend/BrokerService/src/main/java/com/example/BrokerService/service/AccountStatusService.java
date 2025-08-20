@@ -37,5 +37,12 @@ public class AccountStatusService {
         accountStatusRepository.save(status);
     }
 
-
+    public AccountStatus createAccountStatus(CreateAccountStatusDTO asDTO) {
+        AccountStatus accountStatus = new AccountStatus();
+        accountStatus.setId(UUID.randomUUID());
+        accountStatus.setAccountId(asDTO.getAccountId());
+        accountStatus.setDate(asDTO.getDate());
+        accountStatus.setOte(asDTO.getOte());
+        return accountStatusRepository.save(accountStatus);
+    }
 }

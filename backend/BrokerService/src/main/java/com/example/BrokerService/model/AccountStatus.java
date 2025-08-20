@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-@Document(collection = "accounts")
+@Document(collection = "accountStatuses")
 public class AccountStatus {
     @Id
     private UUID id;
