@@ -19,8 +19,7 @@ public class InstrumentController {
 
     @PostMapping
     public ResponseEntity<Instrument> createInstrument(@RequestBody CreateInstrumentDTO instrumentDTO) {
-        Instrument instrument = instrumentService.createInstrument(instrumentDTO);
-        return ResponseEntity.ok(instrument);
+        return ResponseEntity.ok(instrumentService.createInstrument(instrumentDTO));
     }
 
     @GetMapping

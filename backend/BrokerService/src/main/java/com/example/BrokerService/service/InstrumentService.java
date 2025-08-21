@@ -4,6 +4,7 @@ import com.example.BrokerService.model.Instrument;
 import com.example.BrokerService.repository.InstrumentRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InstrumentService {
@@ -36,6 +38,8 @@ public class InstrumentService {
         if (!instrumentRepository.existsById(id)) {
             throw new DataRetrievalFailureException("Instrument not found with id: " + id);
         }
+        System.out.println();
+        log.
         instrumentRepository.deleteById(id);
     }
 }
