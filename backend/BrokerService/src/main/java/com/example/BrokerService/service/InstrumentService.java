@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InstrumentService {
@@ -38,8 +37,6 @@ public class InstrumentService {
         if (!instrumentRepository.existsById(id)) {
             throw new DataRetrievalFailureException("Instrument not found with id: " + id);
         }
-        System.out.println();
-        log.
         instrumentRepository.deleteById(id);
     }
 }
