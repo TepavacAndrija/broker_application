@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package com.example;
+
+option java_package = "com.example.protobuf";
+option java_outer_classname = "TradeProto";
+
+message TradeEvent {
+  string trade_id = 1;
+  string account_id = 2;
+  string instrument_id = 3;
+  Direction direction = 4;
+  int32 quantity = 5;
+  double price = 6;
+  string unit = 7;
+  string delivery_type = 8;
+  string status = 9;
+}
+
+enum Direction {
+  BUY = 0;
+  SELL = 1;
+}

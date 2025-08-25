@@ -7,6 +7,7 @@ import com.example.BrokerService.repository.InstrumentRepository;
 import com.example.BrokerService.repository.TradeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class TradeService {
     private final TradeRepository tradeRepository;
     private final InstrumentRepository instrumentRepository;
+    private final KafkaService kafkaService;
 
     public Trade createTrade(CreateTradeDTO tradeDTO) {
         Trade trade = new Trade();
@@ -78,5 +80,19 @@ public class TradeService {
 
     public List<Trade> getOpenTrades(){
         return tradeRepository.findByStatus(Status.OPEN);
+    }
+
+    //@Scheduled(cron = "0 0 17 * * ?")
+    @Scheduled(fixedDelay = 3000)
+    public void triggerDailyBalanceCalculation() {
+        System.out.println("Pokrećem dnevnu kalkulaciju...");
+        List<Trade> openTrades = tradeRepository.findByStatus(Status.OPEN);
+        LocalDate currentDate = LocalDate.now();
+
+        if(!openTrades.isEmpty()){
+            kafkaService.sendDailyBalanceRequest(openTrades, currentDate);
+        }
+
+        closeExpiredTrades(currentDate);
     }
 }

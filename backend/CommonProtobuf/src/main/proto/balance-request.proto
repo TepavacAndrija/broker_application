@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "trade.proto";
+
+package com.example;
+
+option java_package = "com.example.protobuf";
+option java_outer_classname = "BalanceProto";
+
+message DailyBalanceRequest {
+  string date = 1;
+  repeated TradeEvent trades = 2;
+}
+

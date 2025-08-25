@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package com.example;
+
+option java_package = "com.example.protobuf";
+option java_outer_classname = "OTEProto";
+
+message OTEUpdate {
+  string account_id =1;
+  double ote = 2;
+}
+
+message OTEUpdateResponse{
+  string date = 1;
+  repeated OTEUpdate account_ote = 2;
+}
+
