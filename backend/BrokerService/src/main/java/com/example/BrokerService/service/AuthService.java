@@ -3,7 +3,9 @@ package com.example.BrokerService.service;
 import com.example.BrokerService.model.User;
 import com.example.BrokerService.repository.UserRepository;
 import com.example.BrokerService.security.JwtUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,7 +23,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthDTO authenticate(String username, String password){
+    public AuthDTO authenticate(String username, String password, HttpServletResponse response) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
@@ -32,7 +34,17 @@ public class AuthService {
         User user = userRepository.findByName(username)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found"));
 
-        return new AuthDTO(jwtToken,user.getName(),user.getRole());
+        ResponseCookie jwtCookie = ResponseCookie.from("authToken", jwtToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(86400)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+
+        return new AuthDTO(user.getName(),user.getRole());
     }
 }
 

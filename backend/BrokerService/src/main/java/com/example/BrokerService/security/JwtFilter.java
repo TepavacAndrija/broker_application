@@ -2,9 +2,11 @@ package com.example.BrokerService.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,11 +28,8 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String header = request.getHeader("Authorization");
-            String jwtToken = null;
-            if (header != null && header.startsWith("Bearer ")) {
-                jwtToken = header.substring(7);
-            }
+            String jwtToken = jwtUtils.extractTokenFromCookie(request);
+
 
             if(jwtToken != null && jwtUtils.validateToken(jwtToken)){
                 String username = jwtUtils.getUsernameFromJWT(jwtToken);
@@ -52,3 +51,5 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 }
+
+

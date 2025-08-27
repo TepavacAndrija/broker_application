@@ -82,8 +82,8 @@ public class TradeService {
         return tradeRepository.findByStatus(Status.OPEN);
     }
 
-    //@Scheduled(cron = "0 0 17 * * ?")
-    @Scheduled(fixedDelay = 3000)
+    @Scheduled(cron = "0 0 17 * * ?")
+    //@Scheduled(fixedDelay = 3000)
     public void triggerDailyBalanceCalculation() {
         System.out.println("Pokrećem dnevnu kalkulaciju...");
         List<Trade> openTrades = tradeRepository.findByStatus(Status.OPEN);
