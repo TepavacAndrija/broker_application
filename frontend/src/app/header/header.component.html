@@ -1,0 +1,18 @@
+<header style="display: flex; gap: 20px; padding: 10px; background: #c4c4c4">
+  @if(authService.isLoggedIn$|async){
+  <a [routerLink]="'/dashboard'">Dashboard</a>
+  @if ((user$ | async)?.role === 'MANAGER') {
+  <a [routerLink]="'/users'">Users:</a>
+  } }@else {
+  <b>Welcome</b>
+  } @if(authService.isLoggedIn$|async) {
+  <span style="margin-left: auto">
+    Name: <strong>{{ (user$ | async)?.name }}</strong> ({{
+      authService.getRole()
+    }})
+    <button (click)="logout()" style="margin-left: 10px">Logout</button>
+  </span>
+  } @else {
+  <span style="margin-left: auto">Not registred yet? Contact your manager</span>
+  }
+</header>

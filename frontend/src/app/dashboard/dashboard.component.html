@@ -1,2 +1,78 @@
 <p>dashboard works!</p>
+<table
+  border="1"
+  cellpadding="8"
+  style="width: 100%; border-collapse: collapse"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Instrument(option)</th>
+      <th>Account</th>
+      <th>Direction</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Status</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let trade of trades">
+      <td>{{ trade.id }}</td>
+      <td>{{ trade.instrument.code }}</td>
+      <td>{{ trade.account.name }}</td>
+      <td>{{ trade.direction }}</td>
+      <td>{{ trade.quantity }}</td>
+      <td>{{ trade.price }}</td>
+      <td>{{ trade.status }}</td>
+      <button (click)="startEdit(trade)">Edit</button>
+    </tr>
+  </tbody>
+</table>
+@if (editingTrade) {
+<div style="margin-top: 20px; padding: 16px; border: 1px solid #be6969">
+  <h3>Edit a trade</h3>
+
+  <label>
+    Quantity:
+    <input type="number" [(ngModel)]="editingTrade.quantity" />
+  </label>
+
+  <label style="margin-left: 10px">
+    Price:
+    <input type="number" step="0.01" [(ngModel)]="editingTrade.price" />
+  </label>
+
+  <label style="margin-left: 10px">
+    Direction:
+    <select [(ngModel)]="editingTrade.direction" name="direction">
+      <option value="BUY">BUY</option>
+      <option value="SELL">SELL</option>
+    </select>
+  </label>
+
+  <label style="margin-left: 10px">
+    Account:
+    <select [(ngModel)]="editingTrade.account.id" name="accountId">
+      <option *ngFor="let acc of accounts" [value]="acc.id">
+        {{ acc.name }}
+      </option>
+    </select>
+  </label>
+
+  <label style="margin-left: 10px">
+    Instrumebt:
+    <select [(ngModel)]="editingTrade.instrument.id" name="instrumentId">
+      <option *ngFor="let i of instruments" [value]="i.id">
+        {{ i.code }}
+      </option>
+    </select>
+  </label>
+
+  <div style="margin-top: 10px">
+    <button (click)="saveEdit()">Sačuvaj</button>
+    <button (click)="cancelEdit()" style="margin-left: 10px">Otkaži</button>
+  </div>
+</div>
+}
 <button (click)="logout()">Logout</button>

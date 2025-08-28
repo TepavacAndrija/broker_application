@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,6 +34,21 @@ public class TradeService {
         trade.setDeliveryType(tradeDTO.getDeliveryType());
         trade.setUnit(tradeDTO.getUnit());
         trade.setStatus(tradeDTO.getStatus());
+        return tradeRepository.save(trade);
+    }
+
+    public Trade updateTrade(@PathVariable UUID id, CreateTradeDTO createTradeDTO) {
+        Trade trade = tradeRepository.findById(id).
+                orElseThrow(() -> new DataRetrievalFailureException(String.format("Trade with id %s not found", id)));
+
+        trade.setInstrumentId(createTradeDTO.getInstrumentId());
+        trade.setAccountId(createTradeDTO.getAccountId());
+        trade.setPrice(createTradeDTO.getPrice());
+        trade.setQuantity(createTradeDTO.getQuantity());
+        trade.setDirection(createTradeDTO.getDirection());
+        trade.setDeliveryType(createTradeDTO.getDeliveryType());
+        trade.setUnit(createTradeDTO.getUnit());
+
         return tradeRepository.save(trade);
     }
 

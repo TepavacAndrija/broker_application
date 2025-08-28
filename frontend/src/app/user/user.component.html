@@ -1,0 +1,51 @@
+<h2>User managment</h2>
+
+<table
+  border="1"
+  cellpadding="8"
+  style="width: 100%; border-collapse: collapse; margin-bottom: 20px"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{ user.id }}</td>
+      <td>{{ user.name }}</td>
+      <td>{{ user.role }}</td>
+      <td>
+        <button (click)="deleteUser(user.id)">Obriši</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div>
+  <h3>Create User</h3>
+  <label>
+    Name:
+    <input #nameInput type="text" />
+  </label>
+  <label style="margin-left: 10px">
+    Pass:
+    <input #passwordInput type="password" />
+  </label>
+  <label style="margin-left: 10px">
+    Role:
+    <select #roleInput>
+      <option value="MANAGER">Manager</option>
+      <option value="BROKER">Broker</option>
+    </select>
+  </label>
+  <button
+    (click)="createUser(nameInput, passwordInput, roleInput)"
+    style="margin-left: 10px"
+  >
+    Create
+  </button>
+</div>

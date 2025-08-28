@@ -5,12 +5,7 @@ import com.example.BrokerService.service.CreateTradeDTO;
 import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +31,12 @@ public class TradeController {
     @GetMapping("/{id}")
     public ResponseEntity<Trade> getTradeById(@PathVariable UUID id) {
         return ResponseEntity.of(tradeService.getTradeById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Trade> updateTradeById(@PathVariable UUID id, @RequestBody CreateTradeDTO tradeDTO) {
+        Trade updatedTrade = tradeService.updateTrade(id, tradeDTO);
+        return ResponseEntity.ok(updatedTrade);
     }
 
     @GetMapping("/account/{accountId}")

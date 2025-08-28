@@ -15,4 +15,6 @@ public interface TradeRepository extends MongoRepository<Trade,UUID> {
     @Query("{'maturityDate': {$lt: ?0}, 'status': 'OPEN'}")
     List<Trade> findExpiredTrades(LocalDate currentDate);
     List<Trade> findByStatus(Status status);
+
+    List<Trade> id(UUID id);
 }
