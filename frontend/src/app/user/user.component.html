@@ -19,6 +19,7 @@
       <td>{{ user.name }}</td>
       <td>{{ user.role }}</td>
       <td>
+        <button (click)="startEdit(user)">Edit</button>
         <button (click)="deleteUser(user.id)">Obriši</button>
       </td>
     </tr>
@@ -49,3 +50,27 @@
     Create
   </button>
 </div>
+
+@if (editingUser) {
+<div style="margin-top: 20px; padding: 16px; border: 1px solid #12c43e">
+  <h3>Edit user</h3>
+
+  <label>
+    Name:
+    <input type="text" [(ngModel)]="editingUser.name" />
+  </label>
+
+  <label style="margin-left: 10px">
+    Role:
+    <select [(ngModel)]="editingUser.role" name="role">
+      <option value="MANAGER">Manager</option>
+      <option value="BROKER">Broker</option>
+    </select>
+  </label>
+
+  <div style="margin-top: 10px">
+    <button (click)="saveEdit()">Save</button>
+    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+  </div>
+</div>
+}

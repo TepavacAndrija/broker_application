@@ -1,5 +1,6 @@
 package com.example.BrokerService.service;
 
+import com.example.BrokerService.model.Role;
 import com.example.BrokerService.model.User;
 import com.example.BrokerService.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,23 @@ public class UserService {
         user.setRole(userDTO.getRole());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         return userRepository.save(user);
+    }
+
+    public User updateUser(UUID id, UpdateUserDTO userDTO) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User userToUpdate = user.get();
+            if(userDTO.getName() != null) {
+                userToUpdate.setName(userDTO.getName());
+            }
+            if(userDTO.getRole() != null) {
+                userToUpdate.setRole(userDTO.getRole());
+            }
+            return userRepository.save(userToUpdate);
+        }
+        else  {
+            throw new DataRetrievalFailureException("User with id " + id + " not found");
+        }
     }
 
     public void deleteUser(UUID id) {

@@ -9,6 +9,10 @@ export interface CreateUserDTO {
   password: string;
   role: Role;
 }
+export interface UpdateUserDTO {
+  name: string;
+  role: Role;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +34,12 @@ export class UserService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/users/${id}`, {
+      withCredentials: true,
+    });
+  }
+
+  update(id: string, user: UpdateUserDTO): Observable<UserDTO> {
+    return this.http.post<UserDTO>(`${environment.apiUrl}/users/${id}`, user, {
       withCredentials: true,
     });
   }

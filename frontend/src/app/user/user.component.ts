@@ -3,16 +3,18 @@ import { Component, OnInit } from '@angular/core';
 import { UserDTO } from '../models/user.dto';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
 })
 export class UserComponent implements OnInit {
   users: UserDTO[] = [];
+  editingUser: UserDTO | null = null;
 
   constructor(private userService: UserService) {}
 
@@ -60,5 +62,30 @@ export class UserComponent implements OnInit {
         console.error(err);
       },
     });
+  }
+
+  startEdit(user: UserDTO): void {
+    this.editingUser = { ...user };
+  }
+
+  saveEdit(): void {
+    if (!this.editingUser) return;
+
+    const { id, name, role } = this.editingUser;
+
+    this.userService.update(id, { name, role }).subscribe({
+      next: () => {
+        this.cancelEdit();
+        this.loadUsers();
+      },
+      error: (e) => {
+        alert('Error while updating');
+        console.error(e);
+      },
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingUser = null;
   }
 }

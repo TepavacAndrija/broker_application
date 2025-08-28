@@ -2,6 +2,7 @@ package com.example.BrokerService.controller;
 
 import com.example.BrokerService.model.User;
 import com.example.BrokerService.service.CreateUserDTO;
+import com.example.BrokerService.service.UpdateUserDTO;
 import com.example.BrokerService.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @PostMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody UpdateUserDTO userDTO) {
+        return ResponseEntity.ok(userService.updateUser(id,userDTO));
+    }
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
