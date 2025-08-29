@@ -3,7 +3,11 @@
   <a [routerLink]="'/dashboard'">Dashboard</a>
   @if ((user$ | async)?.role === 'MANAGER') {
   <a [routerLink]="'/users'">Users:</a>
-  } }@else {
+  }
+  <a [routerLink]="'/instruments'">Instruments</a>
+  <a [routerLink]="'/accounts'">Accounts</a>
+  <a [routerLink]="'/account-status'">Account status</a>
+  }@else {
   <b>Welcome</b>
   } @if(authService.isLoggedIn$|async) {
   <span style="margin-left: auto">

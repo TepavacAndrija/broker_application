@@ -1,14 +1,14 @@
 package com.example.BrokerService.service;
 
 import com.example.BrokerService.model.AccountStatus;
-import com.example.BrokerService.model.Trade;
-import com.example.BrokerService.repository.AccountRepository;
 import com.example.BrokerService.repository.AccountStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +35,13 @@ public class AccountStatusService {
                 });
         status.setOte(ote);
         accountStatusRepository.save(status);
+    }
+
+    public List<AccountStatus> getAllByDate(LocalDate date) {
+        Date startOfDay = Date.from(date.atStartOfDay(ZoneOffset.UTC).toInstant());
+        Date endOfDay = Date.from(date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
+        System.out.println(startOfDay + " to je bio pocetak, a kraj je " + endOfDay);
+        return accountStatusRepository.findByDateRange(startOfDay, endOfDay);
     }
 
     public AccountStatus createAccountStatus(CreateAccountStatusDTO asDTO) {

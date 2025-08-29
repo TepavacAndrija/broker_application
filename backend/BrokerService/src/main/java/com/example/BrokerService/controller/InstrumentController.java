@@ -27,6 +27,12 @@ public class InstrumentController {
         return ResponseEntity.ok(instrumentService.getAllInstruments());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Instrument> updateInstrument(@PathVariable UUID id, @RequestBody CreateInstrumentDTO instrumentDTO) {
+        Instrument updated = instrumentService.updateInstrument(id, instrumentDTO);
+        return ResponseEntity.ok(updated);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Instrument> getInstrumentById(@PathVariable UUID id) {
         return ResponseEntity.of(instrumentService.getInstrumentById(id));

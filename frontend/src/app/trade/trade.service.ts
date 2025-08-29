@@ -20,6 +20,17 @@ export interface TradeDTO {
   status: 'OPEN' | 'EXERCISED' | 'CLOSED';
 }
 
+export interface CreateTradeDTO {
+  instrumentId: string;
+  accountId: string;
+  direction: 'BUY' | 'SELL';
+  quantity: number;
+  price: number;
+  unit: string;
+  deliveryType: string;
+  status: 'OPEN' | 'EXERCISED' | 'CLOSED';
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -70,6 +81,25 @@ export class TradeService {
     return this.http.put<TradeDTO>(
       `${environment.apiUrl}/trades/${trade.id}`,
       trade,
+      { withCredentials: true }
+    );
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/trades/${id}`, {
+      withCredentials: true,
+    });
+  }
+  create(dto: CreateTradeDTO): Observable<TradeDTO> {
+    return this.http.post<TradeDTO>(`${environment.apiUrl}/trades`, dto, {
+      withCredentials: true,
+    });
+  }
+
+  exercise(id: string): Observable<TradeDTO> {
+    return this.http.post<TradeDTO>(
+      `${environment.apiUrl}/trades/${id}/exercise`,
+      {},
       { withCredentials: true }
     );
   }

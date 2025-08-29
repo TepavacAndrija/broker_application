@@ -28,6 +28,12 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getAllAccounts());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Account> updateAccount(
+            @PathVariable UUID id,
+            @RequestBody CreateAccountDTO request) {
+        return ResponseEntity.ok(accountService.updateAccount(id, request));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Account> getAccountById(@PathVariable UUID id) {
         return ResponseEntity.of(accountService.getAccountById(id));

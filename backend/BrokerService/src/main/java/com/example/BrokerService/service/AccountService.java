@@ -32,6 +32,22 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+    public Account updateAccount(UUID id, CreateAccountDTO accountDTO) {
+        Optional<Account> account = accountRepository.findById(id);
+        if(account.isPresent()) {
+            Account accountToUpdate = account.get();
+            if(accountDTO.getName() != null) {
+                accountToUpdate.setName(accountDTO.getName());
+            }
+            if(accountDTO.getUserInfo() != null) {
+                accountToUpdate.setUserInfo(accountDTO.getUserInfo());
+            }
+            return accountRepository.save(accountToUpdate);
+        }
+        else {
+            throw new DataRetrievalFailureException("Account with id " + id + " not found");
+        }
+    }
     public void deleteAccount(UUID id) {
         if (!accountRepository.existsById(id)) {
             throw new DataRetrievalFailureException("Account not found with id: " + id);

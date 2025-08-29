@@ -1,0 +1,54 @@
+<h2>Accounts</h2>
+
+<table
+  border="1"
+  cellpadding="8"
+  style="width: 100%; border-collapse: collapse"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>User info</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let acc of accounts">
+      <td>{{ acc.id }}</td>
+      <td>{{ acc.name }}</td>
+      <td>{{ acc.userInfo }}</td>
+      <td>
+        <button (click)="startEdit(acc)" [disabled]="!isManager()">Edit</button>
+        <button (click)="deleteAccount(acc.id)" [disabled]="!isManager()">
+          Delete
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+@if (editingAccount) {
+<div style="margin-top: 20px; padding: 16px; border: 1px solid #5a5a5a">
+  <h3>{{ editingAccount.id ? "Edit" : "Create" }} account</h3>
+
+  <label>
+    Name:
+    <input type="text" [(ngModel)]="editingAccount.name" />
+  </label>
+
+  <label style="margin-left: 10px">
+    User info:
+    <input type="text" [(ngModel)]="editingAccount.userInfo" />
+  </label>
+
+  <div style="margin-top: 10px">
+    <button (click)="saveAccount()">Save</button>
+    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+  </div>
+</div>
+} @if (!editingAccount && isManager()){
+<div style="margin-top: 10px">
+  <button (click)="startCreate()">+ New account</button>
+</div>
+}

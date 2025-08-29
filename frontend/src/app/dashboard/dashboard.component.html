@@ -26,10 +26,59 @@
       <td>{{ trade.price }}</td>
       <td>{{ trade.status }}</td>
       <button (click)="startEdit(trade)">Edit</button>
+      @if (isManager()) {
+      <button (click)="deleteTrade(trade.id)">Obriši</button>
+      } @if (trade.status === 'OPEN') {
+      <button (click)="exerciseTrade(trade.id)">Exercise</button>
+      }
     </tr>
   </tbody>
 </table>
-@if (editingTrade) {
+
+@if (isManager()) {
+<div style="margin-bottom: 20px; padding: 16px; border: 1px solid #ccc">
+  <h3>Create trade</h3>
+  <label>
+    Account:
+    <select [(ngModel)]="newTrade.accountId">
+      @for (acc of accounts; track acc.id) {
+      <option [value]="acc.id">{{ acc.name }}</option>
+      }
+    </select>
+  </label>
+
+  <label style="margin-left: 10px">
+    Instrument:
+    <select [(ngModel)]="newTrade.instrumentId">
+      @for (inst of instruments; track inst.id) {
+      <option [value]="inst.id">{{ inst.code }}</option>
+      }
+    </select>
+  </label>
+
+  <label style="margin-left: 10px">
+    Direction:
+    <select [(ngModel)]="newTrade.direction">
+      <option value="BUY">BUY</option>
+      <option value="SELL">SELL</option>
+    </select>
+  </label>
+
+  <label style="margin-left: 10px">
+    Quantity:
+    <input type="number" [(ngModel)]="newTrade.quantity" />
+  </label>
+
+  <label style="margin-left: 10px">
+    Price:
+    <input type="number" step="0.01" [(ngModel)]="newTrade.price" />
+  </label>
+
+  <div style="margin-top: 10px">
+    <button (click)="createTrade()">Create</button>
+  </div>
+</div>
+} @if (editingTrade) {
 <div style="margin-top: 20px; padding: 16px; border: 1px solid #be6969">
   <h3>Edit a trade</h3>
 

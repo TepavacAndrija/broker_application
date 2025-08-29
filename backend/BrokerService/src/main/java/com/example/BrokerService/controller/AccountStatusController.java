@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,6 +28,14 @@ public class AccountStatusController {
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
     {
         return ResponseEntity.of(accountStatusService.findByAccountIdAndDate(accountId, date));
+    }
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<AccountStatus>> getAllStatusesForDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        System.out.println("Datum je="+date + "i svi koji postoje su "+ accountStatusService.getAllByDate(date));
+        return ResponseEntity.ok(accountStatusService.getAllByDate(date));
     }
 
     @PostMapping("/{accountId}/date/{date}/ote")

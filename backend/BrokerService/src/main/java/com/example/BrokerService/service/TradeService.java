@@ -37,7 +37,7 @@ public class TradeService {
         return tradeRepository.save(trade);
     }
 
-    public Trade updateTrade(@PathVariable UUID id, CreateTradeDTO createTradeDTO) {
+    public Trade updateTrade(UUID id, CreateTradeDTO createTradeDTO) {
         Trade trade = tradeRepository.findById(id).
                 orElseThrow(() -> new DataRetrievalFailureException(String.format("Trade with id %s not found", id)));
 

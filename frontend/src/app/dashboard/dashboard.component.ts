@@ -32,6 +32,17 @@ export class DashboardComponent implements OnInit {
   instruments: InstrumentDTO[] = [];
   editingTrade: TradeView | null = null;
 
+  newTrade = {
+    accountId: '',
+    instrumentId: '',
+    direction: 'BUY' as 'BUY' | 'SELL',
+    quantity: 0,
+    price: 0,
+    unit: 'PER_UNIT',
+    deliveryType: 'CASH',
+    status: 'OPEN' as 'OPEN' | 'EXERCISED' | 'CLOSED',
+  };
+
   ngOnInit(): void {
     this.loadAllData();
   }
@@ -84,8 +95,45 @@ export class DashboardComponent implements OnInit {
     this.editingTrade = null;
   }
 
+  createTrade(): void {
+    this.tradeService.create(this.newTrade).subscribe({
+      next: () => {
+        this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
+        this.loadAllData();
+      },
+      error: (err) => {
+        alert('Error while creating');
+        console.error(err);
+      },
+    });
+  }
+
+  deleteTrade(id: string): void {
+    if (confirm('Delete trade?')) {
+      this.tradeService.delete(id).subscribe(() => {
+        this.loadAllData();
+      });
+    }
+  }
+
+  exerciseTrade(id: string): void {
+    this.tradeService.exercise(id).subscribe({
+      next: () => {
+        alert('Trade exercised!');
+        this.loadAllData();
+      },
+      error: (err) => {
+        alert('Cant exercise');
+        console.error(err);
+      },
+    });
+  }
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  isManager(): boolean {
+    return this.authService.getRole() === 'MANAGER';
   }
 }

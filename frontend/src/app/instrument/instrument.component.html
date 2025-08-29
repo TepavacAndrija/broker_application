@@ -1,0 +1,56 @@
+<h2>Instruments</h2>
+
+<table
+  border="1"
+  cellpadding="8"
+  style="width: 100%; border-collapse: collapse"
+>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Code</th>
+      <th>Maturity date</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let inst of instruments">
+      <td>{{ inst.id }}</td>
+      <td>{{ inst.code }}</td>
+      <td>{{ inst.maturityDate }}</td>
+      <td>
+        <button (click)="startEdit(inst)" [disabled]="!isManager()">
+          Edit
+        </button>
+        <button (click)="deleteInstrument(inst.id)" [disabled]="!isManager()">
+          Delete
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+@if (editingInstrument) {
+<div style="margin-top: 20px; padding: 16px; border: 1px solid #ccc">
+  <h3>{{ editingInstrument.id ? "Edit" : "Create" }} instrument</h3>
+
+  <label>
+    Code:
+    <input type="text" [(ngModel)]="editingInstrument.code" />
+  </label>
+
+  <label style="margin-left: 10px">
+    Maturity date:
+    <input type="date" [(ngModel)]="editingInstrument.maturityDate" />
+  </label>
+
+  <div style="margin-top: 10px">
+    <button (click)="saveInstrument()">Save</button>
+    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+  </div>
+</div>
+} @if (!editingInstrument && isManager()){
+<div style="margin-top: 10px">
+  <button (click)="startCreate()">+ New instrument</button>
+</div>
+}
