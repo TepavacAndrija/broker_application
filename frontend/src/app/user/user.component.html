@@ -1,76 +1,167 @@
-<h2>User managment</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">User Management</h2>
 
-<table
-  border="1"
-  cellpadding="8"
-  style="width: 100%; border-collapse: collapse; margin-bottom: 20px"
->
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Role</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let user of users">
-      <td>{{ user.id }}</td>
-      <td>{{ user.name }}</td>
-      <td>{{ user.role }}</td>
-      <td>
-        <button (click)="startEdit(user)">Edit</button>
-        <button (click)="deleteUser(user.id)">Delete</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<div>
-  <h3>Create User</h3>
-  <label>
-    Name:
-    <input #nameInput type="text" />
-  </label>
-  <label style="margin-left: 10px">
-    Pass:
-    <input #passwordInput type="password" />
-  </label>
-  <label style="margin-left: 10px">
-    Role:
-    <select #roleInput>
-      <option value="MANAGER">Manager</option>
-      <option value="BROKER">Broker</option>
-    </select>
-  </label>
-  <button
-    (click)="createUser(nameInput, passwordInput, roleInput)"
-    style="margin-left: 10px"
-  >
-    Create
+  @if (isManager()) {
+  <button class="btn btn-primary mb-3" (click)="showCreateModal = true">
+    + Create User
   </button>
+  }
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.id) {
+          <tr>
+            <td>
+              <small class="text-muted">{{ user.id | slice : 0 : 8 }}...</small>
+            </td>
+            <td>{{ user.name }}</td>
+            <td>
+              <span
+                class="badge"
+                [class.bg-primary]="user.role === 'MANAGER'"
+                [class.bg-secondary]="user.role === 'BROKER'"
+              >
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              @if (isManager()) {
+              <button
+                class="btn btn-sm btn-outline-primary me-1"
+                (click)="startEdit(user)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteUser(user.id)"
+              >
+                Delete
+              </button>
+              } @else {
+              <span class="text-muted">No actions</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
-@if (editingUser) {
-<div style="margin-top: 20px; padding: 16px; border: 1px solid #12c43e">
-  <h3>Edit user</h3>
-
-  <label>
-    Name:
-    <input type="text" [(ngModel)]="editingUser.name" />
-  </label>
-
-  <label style="margin-left: 10px">
-    Role:
-    <select [(ngModel)]="editingUser.role" name="role">
-      <option value="MANAGER">Manager</option>
-      <option value="BROKER">Broker</option>
-    </select>
-  </label>
-
-  <div style="margin-top: 10px">
-    <button (click)="saveEdit()">Save</button>
-    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+@if (showCreateModal) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="showCreateModal = false"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input #nameInput type="text" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input #passwordInput type="password" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select #roleInput class="form-select">
+              <option value="MANAGER">Manager</option>
+              <option value="BROKER">Broker</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="showCreateModal = false"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="
+            createUser(nameInput, passwordInput, roleInput);
+            showCreateModal = false
+          "
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+} @if (editingUser) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit User</h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingUser.name"
+              name="name"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select
+              class="form-select"
+              [(ngModel)]="editingUser.role"
+              name="role"
+            >
+              <option value="MANAGER">Manager</option>
+              <option value="BROKER">Broker</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveEdit()">
+          Save
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 }

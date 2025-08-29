@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
   accounts: AccountDTO[] = [];
   instruments: InstrumentDTO[] = [];
   editingTrade: TradeView | null = null;
+  showCreateModal = false;
 
   newTrade = {
     accountId: '',
@@ -98,6 +99,7 @@ export class DashboardComponent implements OnInit {
   createTrade(): void {
     this.tradeService.create(this.newTrade).subscribe({
       next: () => {
+        this.showCreateModal = false;
         this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
         this.loadAllData();
       },

@@ -1,56 +1,108 @@
-<h2>Instruments</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">Instruments</h2>
 
-<table
-  border="1"
-  cellpadding="8"
-  style="width: 100%; border-collapse: collapse"
->
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Code</th>
-      <th>Maturity date</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let inst of instruments">
-      <td>{{ inst.id }}</td>
-      <td>{{ inst.code }}</td>
-      <td>{{ inst.maturityDate }}</td>
-      <td>
-        <button (click)="startEdit(inst)" [disabled]="!isManager()">
-          Edit
-        </button>
-        <button (click)="deleteInstrument(inst.id)" [disabled]="!isManager()">
-          Delete
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  @if (isManager()) {
+  <button class="btn btn-primary mb-3" (click)="startCreate()">
+    + New Instrument
+  </button>
+  }
 
-@if (editingInstrument) {
-<div style="margin-top: 20px; padding: 16px; border: 1px solid #ccc">
-  <h3>{{ editingInstrument.id ? "Edit" : "Create" }} instrument</h3>
-
-  <label>
-    Code:
-    <input type="text" [(ngModel)]="editingInstrument.code" />
-  </label>
-
-  <label style="margin-left: 10px">
-    Maturity date:
-    <input type="date" [(ngModel)]="editingInstrument.maturityDate" />
-  </label>
-
-  <div style="margin-top: 10px">
-    <button (click)="saveInstrument()">Save</button>
-    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Maturity Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inst of instruments; track inst.id) {
+          <tr>
+            <td>
+              <small class="text-muted">{{ inst.id | slice : 0 : 8 }}...</small>
+            </td>
+            <td>
+              <strong>{{ inst.code }}</strong>
+            </td>
+            <td>{{ inst.maturityDate }}</td>
+            <td>
+              @if (isManager()) {
+              <button
+                class="btn btn-sm btn-outline-primary me-1"
+                (click)="startEdit(inst)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteInstrument(inst.id)"
+              >
+                Delete
+              </button>
+              } @else {
+              <span class="text-muted">No actions</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-} @if (!editingInstrument && isManager()){
-<div style="margin-top: 10px">
-  <button (click)="startCreate()">+ New instrument</button>
+
+@if (editingInstrument) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editingInstrument.id ? "Edit" : "Create" }} Instrument
+        </h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Code</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingInstrument.code"
+              name="code"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Maturity Date</label>
+            <input
+              type="date"
+              class="form-control"
+              [(ngModel)]="editingInstrument.maturityDate"
+              name="maturityDate"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveInstrument()"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 }

@@ -1,54 +1,104 @@
-<h2>Accounts</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">Accounts</h2>
 
-<table
-  border="1"
-  cellpadding="8"
-  style="width: 100%; border-collapse: collapse"
->
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>User info</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let acc of accounts">
-      <td>{{ acc.id }}</td>
-      <td>{{ acc.name }}</td>
-      <td>{{ acc.userInfo }}</td>
-      <td>
-        <button (click)="startEdit(acc)" [disabled]="!isManager()">Edit</button>
-        <button (click)="deleteAccount(acc.id)" [disabled]="!isManager()">
-          Delete
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  @if (isManager()) {
+  <button class="btn btn-primary mb-3" (click)="startCreate()">
+    + New Account
+  </button>
+  }
 
-@if (editingAccount) {
-<div style="margin-top: 20px; padding: 16px; border: 1px solid #5a5a5a">
-  <h3>{{ editingAccount.id ? "Edit" : "Create" }} account</h3>
-
-  <label>
-    Name:
-    <input type="text" [(ngModel)]="editingAccount.name" />
-  </label>
-
-  <label style="margin-left: 10px">
-    User info:
-    <input type="text" [(ngModel)]="editingAccount.userInfo" />
-  </label>
-
-  <div style="margin-top: 10px">
-    <button (click)="saveAccount()">Save</button>
-    <button (click)="cancelEdit()" style="margin-left: 10px">Cancel</button>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>User Info</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (acc of accounts; track acc.id) {
+          <tr>
+            <td>
+              <small class="text-muted">{{ acc.id | slice : 0 : 8 }}...</small>
+            </td>
+            <td>
+              <strong>{{ acc.name }}</strong>
+            </td>
+            <td>{{ acc.userInfo || "-" }}</td>
+            <td>
+              @if (isManager()) {
+              <button
+                class="btn btn-sm btn-outline-primary me-1"
+                (click)="startEdit(acc)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteAccount(acc.id)"
+              >
+                Delete
+              </button>
+              } @else {
+              <span class="text-muted">No actions</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-} @if (!editingAccount && isManager()){
-<div style="margin-top: 10px">
-  <button (click)="startCreate()">+ New account</button>
+
+@if (editingAccount) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editingAccount.id ? "Edit" : "Create" }} Account
+        </h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingAccount.name"
+              name="name"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">User Info</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingAccount.userInfo"
+              name="userInfo"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveAccount()">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 }

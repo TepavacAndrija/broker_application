@@ -16,7 +16,12 @@ export class UserComponent implements OnInit {
   users: UserDTO[] = [];
   editingUser: UserDTO | null = null;
 
-  constructor(private userService: UserService) {}
+  showCreateModal = false;
+
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -87,5 +92,8 @@ export class UserComponent implements OnInit {
 
   cancelEdit(): void {
     this.editingUser = null;
+  }
+  isManager(): boolean {
+    return this.authService.getRole() === 'MANAGER';
   }
 }

@@ -23,10 +23,8 @@ export interface AuthDTO {
 export class AuthService {
   private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
   private userSubject = new BehaviorSubject<AuthDTO | null>(null);
-  // private roleSubject = new BehaviorSubject<string | null>(this.getRole());
 
   isLoggedIn$ = this.loggedIn.asObservable();
-  // role$ = this.roleSubject.asObservable();
   public user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthDTO, AuthService } from '../auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { map, Observable } from 'rxjs';
@@ -8,7 +8,7 @@ import { UserDTO } from '../models/user.dto';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })

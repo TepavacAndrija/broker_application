@@ -1,4 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+.nav-link.active {
+  font-weight: bold;
+  color: #4b6043 !important;
+  background-color: #ced9d065;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+
+  background: linear-gradient(45deg, #e3e3e3, #a7ada9) !important;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.bg-deep-navy {
+  background-color: #1a1a2e !important;
+}
+.bg-custom-green {
+  background-color: #4b6043 !important;
+}
+
+th {
+  color: white;
+  background-color: #4b6043 !important;
+}
+
+.btn-primary {
+  background-color: #4b6043 !important;
+  border-color: #4b6043 !important;
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.bg-primary {
+  background-color: #2887e6e5 !important;
+}
+
+.bg-secondary {
+  background-color: #283be6e5 !important;
+}
+
+.bg-warning {
+  background-color: #e68a28e5 !important;
+}
+
+.bg-danger {
+  background-color: #388709 !important;
+}

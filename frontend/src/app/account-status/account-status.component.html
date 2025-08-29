@@ -1,38 +1,59 @@
-<h2>Accounts status</h2>
+<div class="container mt-4">
+  <h2 class="mb-4">Account Status</h2>
 
-<div style="margin-bottom: 20px">
-  <label>
-    Date:
-    <input type="date" [(ngModel)]="selectedDate" (input)="loadStatuses()" />
-  </label>
+  <div class="mb-4">
+    <label class="form-label">Select Date</label>
+    <input
+      type="date"
+      class="form-control w-auto"
+      [(ngModel)]="selectedDate"
+      (input)="loadStatuses()"
+    />
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Account ID</th>
+            <th>Account Name</th>
+            <th>Date</th>
+            <th>OTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (statuses && statuses.length > 0) { @for (status of statuses;
+          track status.accountId) {
+          <tr>
+            <td>
+              <small class="text-muted"
+                >{{ status.accountId | slice : 0 : 8 }}...</small
+              >
+            </td>
+            <td>
+              <strong>{{ getAccountName(status.accountId) }}</strong>
+            </td>
+            <td>{{ status.date }}</td>
+            <td>
+              <span
+                [class.text-success]="status.ote >= 0"
+                [class.text-danger]="status.ote < 0"
+                [class.font-weight-bold]="true"
+              >
+                {{ status.ote | number : "1.2-2" }}
+              </span>
+            </td>
+          </tr>
+          } } @else {
+          <tr>
+            <td colspan="4" class="text-center text-muted py-3">
+              <em>No data available for selected date</em>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
-
-<table
-  border="1"
-  cellpadding="8"
-  style="width: 100%; border-collapse: collapse"
->
-  <thead>
-    <tr>
-      <th>Account ID</th>
-      <th>Account name</th>
-      <th>Date</th>
-      <th>OTE</th>
-    </tr>
-  </thead>
-  <tbody>
-    @if (statuses && statuses.length > 0) { @for (status of statuses; track
-    status.accountId) {
-    <tr>
-      <td>{{ status.accountId }}</td>
-      <td>{{ getAccountName(status.accountId) }}</td>
-      <td>{{ status.date }}</td>
-      <td>{{ status.ote | number : "1.2-2" }}</td>
-    </tr>
-    } } @else {
-    <tr>
-      <td colspan="4" style="text-align: center">No data for selected date</td>
-    </tr>
-    }
-  </tbody>
-</table>
