@@ -5,6 +5,7 @@ import com.example.BrokerService.service.CreateInstrumentDTO;
 import com.example.BrokerService.service.InstrumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/instruments")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('MANAGER')")
 public class InstrumentController {
 
     private final InstrumentService instrumentService;
@@ -22,6 +24,7 @@ public class InstrumentController {
         return ResponseEntity.ok(instrumentService.createInstrument(instrumentDTO));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<Instrument>> getAllInstruments() {
         return ResponseEntity.ok(instrumentService.getAllInstruments());

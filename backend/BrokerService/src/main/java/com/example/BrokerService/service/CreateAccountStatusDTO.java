@@ -4,11 +4,12 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 public class CreateAccountStatusDTO {
     private UUID accountId;
-    private LocalDate date;
+    private LocalDateTime date;
     private BigDecimal ote;
 }

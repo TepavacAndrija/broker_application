@@ -8,6 +8,7 @@ import com.example.BrokerService.service.CreateAccountStatusDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/account-status")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class AccountStatusController {
 
     private final AccountStatusService accountStatusService;
@@ -38,18 +40,19 @@ public class AccountStatusController {
         return ResponseEntity.ok(accountStatusService.getAllByDate(date));
     }
 
-    @PostMapping("/{accountId}/date/{date}/ote")
-    public ResponseEntity<AccountStatus> updateOTE(
-            @PathVariable UUID accountId,
-            @PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestBody BigDecimal ote){
-        accountStatusService.updateOTE(accountId, date, ote);
-        return ResponseEntity.noContent().build();
-    }
 
-    @PostMapping
-    public ResponseEntity<AccountStatus> createAccount(@RequestBody CreateAccountStatusDTO asDTO) {
-        AccountStatus as = accountStatusService.createAccountStatus(asDTO);
-        return ResponseEntity.ok(as);
-    }
+//    @PostMapping("/{accountId}/date/{date}/ote")
+//    public ResponseEntity<AccountStatus> updateOTE(
+//            @PathVariable UUID accountId,
+//            @PathVariable @DateTimeFormat(iso=DateTimeFormat.ISO.DATE) LocalDate date,
+//            @RequestBody BigDecimal ote){
+//        accountStatusService.updateOTE(accountId, date, ote);
+//        return ResponseEntity.noContent().build();
+//    }
+
+//    @PostMapping
+//    public ResponseEntity<AccountStatus> createAccountStatus(@RequestBody CreateAccountStatusDTO asDTO) {
+//        AccountStatus as = accountStatusService.createAccountStatus(asDTO);
+//        return ResponseEntity.ok(as);
+//    }
 }

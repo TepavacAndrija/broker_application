@@ -5,6 +5,7 @@ import com.example.BrokerService.service.CreateTradeDTO;
 import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/trades")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('MANAGER')")
 public class TradeController {
     private final TradeService tradeService;
 
@@ -23,6 +25,7 @@ public class TradeController {
         return ResponseEntity.ok(trade);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<Trade>> getAllTrades() {
         return ResponseEntity.ok(tradeService.getAllTrades());

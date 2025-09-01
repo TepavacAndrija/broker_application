@@ -5,6 +5,7 @@ import com.example.BrokerService.service.AccountService;
 import com.example.BrokerService.service.CreateAccountDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('MANAGER')")
 public class AccountController {
 
     private final AccountService accountService;
@@ -23,6 +25,7 @@ public class AccountController {
         return ResponseEntity.ok(account);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<Account>> getAllAccounts() {
         return ResponseEntity.ok(accountService.getAllAccounts());

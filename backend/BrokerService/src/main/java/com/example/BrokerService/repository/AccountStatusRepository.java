@@ -15,5 +15,4 @@ public interface AccountStatusRepository extends MongoRepository<AccountStatus, 
     @Query("{'date': {$gte: ?0, $lt: ?1}}")
     List<AccountStatus> findByDateRange(Date startOfDay, Date endOfDay);
 
-    List<AccountStatus> findByDateBetween(Date dateAfter, Date dateBefore);
 }

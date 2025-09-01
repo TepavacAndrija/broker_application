@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class AccountStatusService {
                     AccountStatus newStatus = new AccountStatus();
                     newStatus.setId(UUID.randomUUID());
                     newStatus.setAccountId(accountId);
-                    newStatus.setDate(date);
+                    newStatus.setDate(date.atTime(LocalTime.NOON));
                     return newStatus;
                 });
         status.setOte(ote);
@@ -48,7 +49,7 @@ public class AccountStatusService {
         AccountStatus accountStatus = new AccountStatus();
         accountStatus.setId(UUID.randomUUID());
         accountStatus.setAccountId(asDTO.getAccountId());
-        accountStatus.setDate(asDTO.getDate());
+        accountStatus.setDate(asDTO.getDate().toLocalDate().atTime(LocalTime.NOON));
         accountStatus.setOte(asDTO.getOte());
         return accountStatusRepository.save(accountStatus);
     }
