@@ -17,7 +17,7 @@ export interface TradeDTO {
   price: number;
   unit: string;
   deliveryType: string;
-  status: 'OPEN' | 'EXERCISED' | 'CLOSED';
+  status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
 }
 
 export interface CreateTradeDTO {
@@ -28,7 +28,7 @@ export interface CreateTradeDTO {
   price: number;
   unit: string;
   deliveryType: string;
-  status: 'OPEN' | 'EXERCISED' | 'CLOSED';
+  status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
 }
 
 @Injectable({
@@ -100,6 +100,29 @@ export class TradeService {
     return this.http.post<TradeDTO>(
       `${environment.apiUrl}/trades/${id}/exercise`,
       {},
+      { withCredentials: true }
+    );
+  }
+  match(id: string): Observable<TradeDTO> {
+    return this.http.post<TradeDTO>(
+      `${environment.apiUrl}/trades/${id}/match`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  open(id: string): Observable<TradeDTO> {
+    return this.http.post<TradeDTO>(
+      `${environment.apiUrl}/trades/${id}/open`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  findMatchableTrades(dto: CreateTradeDTO): Observable<TradeDTO[]> {
+    return this.http.post<TradeDTO[]>(
+      `${environment.apiUrl}/trades/matchable`,
+      dto,
       { withCredentials: true }
     );
   }

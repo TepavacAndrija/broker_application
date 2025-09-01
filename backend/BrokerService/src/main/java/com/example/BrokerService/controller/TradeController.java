@@ -1,6 +1,9 @@
 package com.example.BrokerService.controller;
 
+import com.example.BrokerService.model.DeliveryType;
+import com.example.BrokerService.model.Direction;
 import com.example.BrokerService.model.Trade;
+import com.example.BrokerService.model.Unit;
 import com.example.BrokerService.service.CreateTradeDTO;
 import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +39,7 @@ public class TradeController {
         return ResponseEntity.of(tradeService.getTradeById(id));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<Trade> updateTradeById(@PathVariable UUID id, @RequestBody CreateTradeDTO tradeDTO) {
         Trade updatedTrade = tradeService.updateTrade(id, tradeDTO);
@@ -51,5 +55,31 @@ public class TradeController {
     public ResponseEntity<Trade> exerciseTrade(@PathVariable UUID id) {
         tradeService.exerciseTrade(id, LocalDate.now());
         return ResponseEntity.of(tradeService.getTradeById(id));
+    }
+
+    @PostMapping("/{id}/match")
+    public ResponseEntity<Trade> matchTrade(@PathVariable UUID id) {
+        tradeService.matchTrade(id, LocalDate.now());
+        return ResponseEntity.of(tradeService.getTradeById(id));
+    }
+
+    @PostMapping("/{id}/open")
+    public ResponseEntity<Trade> openTrade(@PathVariable UUID id) {
+        tradeService.openTrade(id, LocalDate.now());
+        return ResponseEntity.of(tradeService.getTradeById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrade(@PathVariable UUID id) {
+        tradeService.deleteTrade(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/matchable")
+    public ResponseEntity<List<Trade>> getMatchableTrades(@RequestBody CreateTradeDTO trade)
+    {
+
+        List<Trade> matchable = tradeService.findMatchableTrades(trade.getInstrumentId(), trade.getDirection(), trade.getPrice(), trade.getQuantity(), trade.getUnit(), trade.getDeliveryType());
+        return ResponseEntity.ok(matchable);
     }
 }

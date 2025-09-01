@@ -1,7 +1,6 @@
 package com.example.BrokerService.repository;
 
-import com.example.BrokerService.model.Status;
-import com.example.BrokerService.model.Trade;
+import com.example.BrokerService.model.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -17,4 +16,9 @@ public interface TradeRepository extends MongoRepository<Trade,UUID> {
     List<Trade> findByStatus(Status status);
 
     List<Trade> id(UUID id);
+
+   List<Trade> findByInstrumentIdAndStatusAndDirectionAndPriceAndQuantityAndUnitAndDeliveryType(
+           UUID instrumentId, Status status, Direction direction, Double price, Integer quantity, Unit unit, DeliveryType deliveryType);
+
+    List<Trade> findByInstrumentIdAndDirectionAndPriceAndQuantityAndStatus(UUID instrumentId, Direction direction, Double price, Integer quantity, Status status);
 }

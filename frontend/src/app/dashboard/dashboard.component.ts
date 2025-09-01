@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { TradeService } from '../trade/trade.service';
+import { TradeDTO, TradeService } from '../trade/trade.service';
 import { TradeView } from '../models/trade-view.dto';
 import { FormsModule } from '@angular/forms';
-import { combineLatest } from 'rxjs';
+import { combineLatest, switchMap } from 'rxjs';
 import { AccountService } from '../account/account.service';
 import { InstrumentService } from '../instrument/instrument.service';
 import { AccountDTO } from '../models/account.dto';
@@ -41,8 +41,22 @@ export class DashboardComponent implements OnInit {
     price: 0,
     unit: 'PER_UNIT',
     deliveryType: 'CASH',
-    status: 'OPEN' as 'OPEN' | 'EXERCISED' | 'CLOSED',
+    status: 'OPEN' as 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED',
   };
+
+  matchConfirmation: {
+    original: TradeView;
+    matching: {
+      accountId: string;
+      instrumentId: string;
+      direction: 'BUY' | 'SELL';
+      quantity: number;
+      price: number;
+      unit: string;
+      deliveryType: string;
+      status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
+    };
+  } | null = null;
 
   ngOnInit(): void {
     this.loadAllData();
@@ -97,14 +111,54 @@ export class DashboardComponent implements OnInit {
   }
 
   createTrade(): void {
-    this.tradeService.create(this.newTrade).subscribe({
-      next: () => {
-        this.showCreateModal = false;
-        this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
-        this.loadAllData();
+    this.tradeService.findMatchableTrades(this.newTrade).subscribe({
+      next: (matches) => {
+        if (matches.length > 0) {
+          this.executeAutoMatch(matches[0], this.newTrade);
+        } else {
+          this.tradeService
+            .create({ ...this.newTrade, status: 'OPEN' })
+            .subscribe({
+              next: () => {
+                this.showCreateModal = false;
+                this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
+                this.loadAllData();
+              },
+              error: (e) => {
+                alert('Error creating new trade');
+                console.error(e);
+              },
+            });
+        }
+      },
+      error: (e) => {
+        alert('Error while matching');
+        console.error(e);
+      },
+    });
+  }
+
+  executeAutoMatch(existingTrade: TradeDTO, newTradeData: any): void {
+    const tradeToCreate = { ...newTradeData, status: 'MATCHED' };
+
+    this.tradeService.create(tradeToCreate).subscribe({
+      next: (createdTrade) => {
+        this.tradeService.match(existingTrade.id).subscribe({
+          next: () => {
+            alert('Automated matching succesful!');
+            this.showCreateModal = false;
+            this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
+            this.loadAllData();
+          },
+          error: (err) => {
+            alert('Error while matching');
+            console.error(err);
+            this.loadAllData();
+          },
+        });
       },
       error: (err) => {
-        alert('Error while creating');
+        alert('Error while creating new trade');
         console.error(err);
       },
     });
@@ -118,17 +172,47 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  exerciseTrade(id: string): void {
-    this.tradeService.exercise(id).subscribe({
-      next: () => {
-        alert('Trade exercised!');
-        this.loadAllData();
+  confirmMatch(trade: TradeView): void {
+    const matchingDirection = trade.direction === 'BUY' ? 'SELL' : 'BUY';
+
+    this.matchConfirmation = {
+      original: trade,
+      matching: {
+        accountId: this.accounts[0]?.id,
+        instrumentId: trade.instrument.id,
+        direction: matchingDirection,
+        quantity: trade.quantity,
+        price: trade.price,
+        unit: trade.unit,
+        deliveryType: trade.deliveryType,
+        status: 'EXERCISED',
       },
-      error: (err) => {
-        alert('Cant exercise');
-        console.error(err);
-      },
-    });
+    };
+  }
+
+  executeMatch(): void {
+    if (!this.matchConfirmation) return;
+
+    const { original, matching } = this.matchConfirmation;
+
+    this.tradeService
+      .match(original.id)
+      .pipe(switchMap(() => this.tradeService.create(matching)))
+      .subscribe({
+        next: () => {
+          alert('Trade matched successfully!');
+          this.loadAllData();
+          this.cancelMatch();
+        },
+        error: (err) => {
+          alert('Error during match process');
+          console.error(err);
+          this.loadAllData();
+        },
+      });
+  }
+  cancelMatch(): void {
+    this.matchConfirmation = null;
   }
   logout() {
     this.authService.logout();

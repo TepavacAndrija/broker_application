@@ -10,5 +10,5 @@ export interface TradeView {
   price: number;
   unit: string;
   deliveryType: string;
-  status: 'OPEN' | 'EXERCISED' | 'CLOSED';
+  status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
 }

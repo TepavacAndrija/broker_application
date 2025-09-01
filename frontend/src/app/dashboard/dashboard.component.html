@@ -45,6 +45,7 @@
               <span
                 [class.badge]="true"
                 [class.bg-success]="trade.status === 'OPEN'"
+                [class.bg-yellow]="trade.status === 'MATCHED'"
                 [class.bg-info]="trade.status === 'EXERCISED'"
                 [class.bg-secondary]="trade.status === 'CLOSED'"
               >
@@ -69,9 +70,9 @@
               } @if (trade.status === 'OPEN') {
               <button
                 class="btn btn-sm btn-outline-success"
-                (click)="exerciseTrade(trade.id)"
+                (click)="confirmMatch(trade)"
               >
-                Exercise
+                Match
               </button>
               }
             </td>
@@ -87,7 +88,77 @@
   </div>
 </div>
 
-@if (showCreateModal) {
+@if (matchConfirmation) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Match</h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="cancelMatch()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>You are about to create a matching trade:</p>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">
+              Original Trade ({{ matchConfirmation.original.direction }})
+            </h6>
+            <p class="card-text">
+              {{ matchConfirmation.original.quantity }} x
+              {{ matchConfirmation.original.instrument.code }} at
+              {{ matchConfirmation.original.price | number : "1.2-2" }}
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">
+              Matching Trade ({{ matchConfirmation.matching.direction }})
+            </h6>
+            <p class="card-text">
+              {{ matchConfirmation.matching.quantity }} x
+              {{ matchConfirmation.original.instrument.code }} at
+              {{ matchConfirmation.matching.price | number : "1.2-2" }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Select Account for Matching Trade</label>
+          <select
+            class="form-select"
+            [(ngModel)]="matchConfirmation.matching.accountId"
+            name="matchingAccountId"
+          >
+            @for (acc of accounts; track acc.id) {
+            <option [value]="acc.id">{{ acc.name }}</option>
+            }
+          </select>
+        </div>
+        <p class="mt-3">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelMatch()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="executeMatch()">
+          Confirm Match
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+} @if (showCreateModal) {
 <div
   class="modal fade show d-block"
   style="background: rgba(0, 0, 0, 0.5)"

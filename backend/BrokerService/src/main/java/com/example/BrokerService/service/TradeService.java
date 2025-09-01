@@ -1,8 +1,6 @@
 package com.example.BrokerService.service;
 
-import com.example.BrokerService.model.Instrument;
-import com.example.BrokerService.model.Status;
-import com.example.BrokerService.model.Trade;
+import com.example.BrokerService.model.*;
 import com.example.BrokerService.repository.InstrumentRepository;
 import com.example.BrokerService.repository.TradeRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +69,43 @@ public class TradeService {
     public void exerciseTrade(UUID tradeId, LocalDate currentDate) {
         Trade trade = tradeRepository.findById(tradeId)
                 .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
+        if(trade.getStatus()!= Status.MATCHED){
+            throw new IllegalStateException("Trade status is NOT MATCHED, tradeId="+tradeId);
+        }
+
+        Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
+                .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));
+
+        if(currentDate.isAfter(instrument.getMaturityDate())){
+            throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
+        }
+
+        trade.setStatus(Status.EXERCISED);
+        tradeRepository.save(trade);
+    }
+
+    public void openTrade(UUID tradeId, LocalDate currentDate) {
+        Trade trade = tradeRepository.findById(tradeId)
+                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
+        if(trade.getStatus()!= Status.MATCHED){
+            throw new IllegalStateException("Trade status is NOT MATCHED, tradeId="+tradeId);
+        }
+
+        Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
+                .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));
+
+        if(currentDate.isAfter(instrument.getMaturityDate())){
+            throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
+        }
+
+        trade.setStatus(Status.OPEN);
+        tradeRepository.save(trade);
+    }
+
+
+    public void matchTrade(UUID tradeId, LocalDate currentDate) {
+        Trade trade = tradeRepository.findById(tradeId)
+                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
         if(trade.getStatus()!= Status.OPEN){
             throw new IllegalStateException("Trade status is NOT OPEN, tradeId="+tradeId);
         }
@@ -82,7 +117,7 @@ public class TradeService {
             throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
         }
 
-        trade.setStatus(Status.EXERCISED);
+        trade.setStatus(Status.MATCHED);
         tradeRepository.save(trade);
     }
 
@@ -110,5 +145,18 @@ public class TradeService {
         }
 
         closeExpiredTrades(currentDate);
+    }
+
+    public void deleteTrade(UUID id) {
+        if (!tradeRepository.existsById(id)) {
+            throw new DataRetrievalFailureException("Trade not found with id: " + id);
+        }
+        tradeRepository.deleteById(id);
+    }
+
+    public List<Trade> findMatchableTrades(UUID instrumentId, Direction direction, double price, int quantity, Unit unit, DeliveryType deliveryType) {
+        Direction opposite = (direction == Direction.BUY) ? Direction.SELL : Direction.BUY;
+
+        return tradeRepository.findByInstrumentIdAndStatusAndDirectionAndPriceAndQuantityAndUnitAndDeliveryType(instrumentId,Status.OPEN, opposite,price,quantity, unit, deliveryType);
     }
 }
