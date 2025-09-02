@@ -90,9 +90,9 @@ public class TradeService {
     public void openTrade(UUID tradeId, LocalDate currentDate) {
         Trade trade = tradeRepository.findById(tradeId)
                 .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
-        if(trade.getStatus()!= Status.MATCHED){
-            throw new IllegalStateException("Trade status is NOT MATCHED, tradeId="+tradeId);
-        }
+//        if(trade.getStatus()!= Status.MATCHED){
+//            throw new IllegalStateException("Trade status is NOT MATCHED, tradeId="+tradeId);
+//        }
 
         Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
                 .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));

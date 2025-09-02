@@ -27,8 +27,8 @@ export interface CreateTradeDTO {
   direction: 'BUY' | 'SELL';
   quantity: number;
   price: number;
-  unit: string;
-  deliveryType: string;
+  unit: 'PER_UNIT' | 'PER_KG';
+  deliveryType: 'CASH' | 'DELIVERY';
   status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
   matchedTradeId: string | null;
 }

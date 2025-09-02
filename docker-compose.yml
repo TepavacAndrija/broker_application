@@ -1,0 +1,53 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - broker-service
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  broker-service:
+    build: ./backend/BrokerService
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MONGODB_URI=${MONGODB_URI}
+      - KAFKA_BROKERS=${KAFKA_BROKERS}
+    depends_on:
+      - kafka
+
+  balans-service:
+    build: ./backend/BalansService
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BROKERS=${KAFKA_BROKERS}
+    depends_on:
+      - kafka

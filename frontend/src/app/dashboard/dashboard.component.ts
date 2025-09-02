@@ -53,8 +53,8 @@ export class DashboardComponent implements OnInit {
       direction: 'BUY' | 'SELL';
       quantity: number;
       price: number;
-      unit: string;
-      deliveryType: string;
+      unit: 'PER_UNIT' | 'PER_KG';
+      deliveryType: 'CASH' | 'DELIVERY';
       status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
       matchedTradeId: string | null;
     };
@@ -86,12 +86,52 @@ export class DashboardComponent implements OnInit {
     };
 
     this.tradeService.update(dto).subscribe({
-      next: () => {
+      next: (updatedTrade) => {
         if (dto.matchedTradeId) {
           this.tradeService
             .open(dto.matchedTradeId)
             .subscribe(() => this.loadAllData());
         }
+
+        const updatedDTO = {
+          instrumentId: updatedTrade.instrumentId,
+          accountId: updatedTrade.accountId,
+          direction: updatedTrade.direction,
+          quantity: updatedTrade.quantity,
+          price: updatedTrade.price,
+          unit: updatedTrade.unit,
+          deliveryType: updatedTrade.deliveryType,
+          status: updatedTrade.status,
+          matchedTradeId: null,
+        };
+        this.tradeService.findMatchableTrades(updatedDTO).subscribe({
+          next: (matches) => {
+            if (matches.length > 0) {
+              alert('IMA MATCHEVA');
+              this.tradeService
+                .match(matches[0].id)
+                .pipe(
+                  switchMap(() => this.tradeService.match(updatedTrade.id)),
+                  switchMap(() =>
+                    this.tradeService.update({
+                      ...matches[0],
+                      matchedTradeId: updatedTrade.id,
+                    })
+                  ),
+                  switchMap(() =>
+                    this.tradeService.update({
+                      ...updatedTrade,
+                      matchedTradeId: matches[0].id,
+                    })
+                  )
+                )
+                .subscribe(() => this.loadAllData());
+            } else {
+              alert('NEMA MATCHEVA');
+            }
+          },
+        });
+
         this.cancelEdit();
         this.loadAllData();
       },
