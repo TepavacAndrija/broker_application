@@ -32,6 +32,7 @@ public class TradeService {
         trade.setDeliveryType(tradeDTO.getDeliveryType());
         trade.setUnit(tradeDTO.getUnit());
         trade.setStatus(tradeDTO.getStatus());
+        trade.setMatchedTradeId(tradeDTO.getMatchedTradeId());
         return tradeRepository.save(trade);
     }
 
@@ -46,7 +47,8 @@ public class TradeService {
         trade.setDirection(createTradeDTO.getDirection());
         trade.setDeliveryType(createTradeDTO.getDeliveryType());
         trade.setUnit(createTradeDTO.getUnit());
-
+        trade.setMatchedTradeId(createTradeDTO.getMatchedTradeId());
+        trade.setStatus(createTradeDTO.getStatus());
         return tradeRepository.save(trade);
     }
 
@@ -81,6 +83,7 @@ public class TradeService {
         }
 
         trade.setStatus(Status.EXERCISED);
+        trade.setMatchedTradeId(null);
         tradeRepository.save(trade);
     }
 
@@ -99,6 +102,7 @@ public class TradeService {
         }
 
         trade.setStatus(Status.OPEN);
+        trade.setMatchedTradeId(null);
         tradeRepository.save(trade);
     }
 

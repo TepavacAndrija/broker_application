@@ -15,9 +15,10 @@ export interface TradeDTO {
   direction: 'BUY' | 'SELL';
   quantity: number;
   price: number;
-  unit: string;
-  deliveryType: string;
+  unit: 'PER_UNIT' | 'PER_KG';
+  deliveryType: 'CASH' | 'DELIVERY';
   status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
+  matchedTradeId: string | null;
 }
 
 export interface CreateTradeDTO {
@@ -29,6 +30,7 @@ export interface CreateTradeDTO {
   unit: string;
   deliveryType: string;
   status: 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED';
+  matchedTradeId: string | null;
 }
 
 @Injectable({
@@ -43,6 +45,12 @@ export class TradeService {
 
   getAllTrades(): Observable<TradeDTO[]> {
     return this.http.get<TradeDTO[]>(`${environment.apiUrl}/trades`, {
+      withCredentials: true,
+    });
+  }
+
+  getTradeById(id: string): Observable<TradeDTO> {
+    return this.http.get<TradeDTO>(`${environment.apiUrl}/trades/${id}`, {
       withCredentials: true,
     });
   }
@@ -71,6 +79,7 @@ export class TradeService {
               quantity: trade.quantity,
               price: trade.price,
               status: trade.status,
+              matchedTradeId: trade.matchedTradeId,
             } as TradeView)
         );
       })

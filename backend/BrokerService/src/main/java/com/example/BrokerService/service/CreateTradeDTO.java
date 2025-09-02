@@ -18,4 +18,5 @@ public class CreateTradeDTO {
     private Unit unit;
     private DeliveryType deliveryType;
     private Status status;
+    private UUID matchedTradeId;
 }

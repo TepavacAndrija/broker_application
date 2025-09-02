@@ -19,5 +19,6 @@ public class Trade {
     private Unit unit;
     private DeliveryType deliveryType;
     private Status status;
+    private UUID matchedTradeId = null;
 
 }

@@ -1,9 +1,7 @@
 package com.example.BrokerService.controller;
 
-import com.example.BrokerService.model.DeliveryType;
-import com.example.BrokerService.model.Direction;
+
 import com.example.BrokerService.model.Trade;
-import com.example.BrokerService.model.Unit;
 import com.example.BrokerService.service.CreateTradeDTO;
 import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
