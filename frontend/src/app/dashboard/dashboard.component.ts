@@ -79,59 +79,18 @@ export class DashboardComponent implements OnInit {
       direction: this.editingTrade.direction,
       quantity: this.editingTrade.quantity,
       price: this.editingTrade.price,
-      unit: this.editingTrade.unit,
-      deliveryType: this.editingTrade.deliveryType,
+      unit: 'PER_UNIT' as 'PER_UNIT' | 'PER_KG',
+      deliveryType: 'CASH' as 'CASH' | 'DELIVERY',
       status: 'OPEN' as 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED',
       matchedTradeId: this.editingTrade.matchedTradeId,
     };
 
     this.tradeService.update(dto).subscribe({
       next: (updatedTrade) => {
-        if (dto.matchedTradeId) {
-          this.tradeService
-            .open(dto.matchedTradeId)
-            .subscribe(() => this.loadAllData());
-        }
-
-        const updatedDTO = {
-          instrumentId: updatedTrade.instrumentId,
-          accountId: updatedTrade.accountId,
-          direction: updatedTrade.direction,
-          quantity: updatedTrade.quantity,
-          price: updatedTrade.price,
-          unit: updatedTrade.unit,
-          deliveryType: updatedTrade.deliveryType,
-          status: updatedTrade.status,
-          matchedTradeId: null,
-        };
-        this.tradeService.findMatchableTrades(updatedDTO).subscribe({
-          next: (matches) => {
-            if (matches.length > 0) {
-              alert('IMA MATCHEVA');
-              this.tradeService
-                .match(matches[0].id)
-                .pipe(
-                  switchMap(() => this.tradeService.match(updatedTrade.id)),
-                  switchMap(() =>
-                    this.tradeService.update({
-                      ...matches[0],
-                      matchedTradeId: updatedTrade.id,
-                    })
-                  ),
-                  switchMap(() =>
-                    this.tradeService.update({
-                      ...updatedTrade,
-                      matchedTradeId: matches[0].id,
-                    })
-                  )
-                )
-                .subscribe(() => this.loadAllData());
-            } else {
-              alert('NEMA MATCHEVA');
-            }
-          },
-        });
-
+        console.log(
+          'Trade updated successfully. Match status:',
+          updatedTrade.status
+        );
         this.cancelEdit();
         this.loadAllData();
       },
@@ -159,93 +118,22 @@ export class DashboardComponent implements OnInit {
   }
 
   createTrade(): void {
-    this.tradeService.findMatchableTrades(this.newTrade).subscribe({
-      next: (matches) => {
-        if (matches.length > 0) {
-          this.executeAutoMatch(matches[0], this.newTrade);
-        } else {
-          this.tradeService
-            .create({ ...this.newTrade, status: 'OPEN' })
-            .subscribe({
-              next: () => {
-                this.showCreateModal = false;
-                this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
-                this.loadAllData();
-              },
-              error: (e) => {
-                alert('Error creating new trade');
-                console.error(e);
-              },
-            });
-        }
+    this.tradeService.create({ ...this.newTrade, status: 'OPEN' }).subscribe({
+      next: () => {
+        this.showCreateModal = false;
+        this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
+        this.loadAllData();
       },
       error: (e) => {
-        alert('Error while matching');
+        alert('Error creating new trade');
         console.error(e);
-      },
-    });
-  }
-
-  executeAutoMatch(existingTrade: TradeDTO, newTradeData: any): void {
-    const tradeToCreate = {
-      ...newTradeData,
-      status: 'MATCHED' as 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED',
-      matchedTradeId: null,
-    };
-
-    this.tradeService.create(tradeToCreate).subscribe({
-      next: (createdTrade) => {
-        const updatedExisting = {
-          ...existingTrade,
-          status: 'MATCHED' as 'OPEN' | 'EXERCISED' | 'CLOSED' | 'MATCHED',
-          matchedTradeId: createdTrade.id,
-        };
-        const updatedNew = {
-          ...createdTrade,
-          matchedTradeId: existingTrade.id,
-        };
-        this.tradeService.update(updatedExisting).subscribe({
-          next: () => {
-            this.tradeService.update(updatedNew).subscribe({
-              next: () => {
-                alert('Automated matching successful and linked!');
-                this.showCreateModal = false;
-                this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
-                this.loadAllData();
-              },
-              error: (err) => {
-                alert('Error updating new trade with matched ID');
-                console.error(err);
-                this.loadAllData();
-              },
-            });
-          },
-          error: (err) => {
-            alert('Error updating existing trade with matched ID');
-            console.error(err);
-            this.loadAllData();
-          },
-        });
-      },
-      error: (err) => {
-        alert('Error while creating new trade');
-        console.error(err);
       },
     });
   }
 
   deleteTrade(id: string): void {
     if (!confirm('Delete trade?')) return;
-    this.tradeService.getTradeById(id).subscribe({
-      next: (trade) => {
-        if (trade.matchedTradeId) {
-          this.tradeService.open(trade.matchedTradeId).subscribe();
-        }
-      },
-      complete: () => {
-        this.tradeService.delete(id).subscribe(() => this.loadAllData());
-      },
-    });
+    this.tradeService.delete(id).subscribe(() => this.loadAllData());
   }
 
   confirmMatch(trade: TradeView): void {
@@ -259,9 +147,9 @@ export class DashboardComponent implements OnInit {
         direction: matchingDirection,
         quantity: trade.quantity,
         price: trade.price,
-        unit: trade.unit,
-        deliveryType: trade.deliveryType,
-        status: 'MATCHED',
+        unit: 'PER_UNIT' as 'PER_UNIT' | 'PER_KG',
+        deliveryType: 'CASH' as 'CASH' | 'DELIVERY',
+        status: 'OPEN',
         matchedTradeId: trade.id,
       },
     };
@@ -272,43 +160,20 @@ export class DashboardComponent implements OnInit {
 
     const { original, matching } = this.matchConfirmation;
 
-    this.tradeService
-      .match(original.id)
-      .pipe(switchMap(() => this.tradeService.create(matching)))
-      .subscribe({
-        next: (createdTrade) => {
-          const updatedOriginal = {
-            ...original,
-            accountId: original.account.id,
-            instrumentId: original.instrument.id,
-            matchedTradeId: createdTrade.id,
-          };
-          const updatedNew = { ...createdTrade, matchedTradeId: original.id };
-
-          this.tradeService
-            .update(updatedOriginal)
-            .pipe(
-              switchMap(() => this.tradeService.match(updatedOriginal.id)),
-              switchMap(() => this.tradeService.update(updatedNew))
-            )
-            .subscribe({
-              next: () => {
-                alert('Trade matched successfully!');
-                this.loadAllData();
-                this.cancelMatch();
-              },
-              error: (e) => {
-                alert('Error while creating matched trades');
-              },
-            });
-        },
-        error: (err) => {
-          alert('Error during match process');
-          console.error(err);
-          this.loadAllData();
-        },
-      });
+    this.tradeService.create(matching).subscribe({
+      next: () => {
+        alert('Trade matched successfully!');
+        this.loadAllData();
+        this.cancelMatch();
+      },
+      error: (err) => {
+        console.error('Error during match process:', err);
+        alert('Error during match process. Please check console for details.');
+        this.loadAllData();
+      },
+    });
   }
+
   cancelMatch(): void {
     this.matchConfirmation = null;
   }

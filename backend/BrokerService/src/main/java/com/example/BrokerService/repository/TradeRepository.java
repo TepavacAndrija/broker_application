@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TradeRepository extends MongoRepository<Trade,UUID> {
-    List<Trade> findByInstrumentId(UUID instrumentId);
     List<Trade> findByAccountId(UUID accountId);
     @Query("{'maturityDate': {$lt: ?0}, 'status': 'OPEN'}")
     List<Trade> findExpiredTrades(LocalDate currentDate);
@@ -20,5 +19,4 @@ public interface TradeRepository extends MongoRepository<Trade,UUID> {
    List<Trade> findByInstrumentIdAndStatusAndDirectionAndPriceAndQuantityAndUnitAndDeliveryType(
            UUID instrumentId, Status status, Direction direction, Double price, Integer quantity, Unit unit, DeliveryType deliveryType);
 
-    List<Trade> findByInstrumentIdAndDirectionAndPriceAndQuantityAndStatus(UUID instrumentId, Direction direction, Double price, Integer quantity, Status status);
-}
+    }

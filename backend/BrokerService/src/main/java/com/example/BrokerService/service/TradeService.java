@@ -33,13 +33,58 @@ public class TradeService {
         trade.setUnit(tradeDTO.getUnit());
         trade.setStatus(tradeDTO.getStatus());
         trade.setMatchedTradeId(tradeDTO.getMatchedTradeId());
-        return tradeRepository.save(trade);
+
+        Trade savedTrade = tradeRepository.save(trade);
+
+        if(Status.OPEN.equals(savedTrade.getStatus())){
+            matchWithExistingTrade(savedTrade);
+        }
+
+        return savedTrade;
     }
+
+    public void matchWithExistingTrade(Trade newTrade){
+        Direction opposite = (newTrade.getDirection() == Direction.BUY)?Direction.SELL:Direction.BUY;
+
+        System.out.println("Opposite: "+opposite + "instrument id: "+newTrade.getInstrumentId()
+                +"price: "+newTrade.getPrice()+"quantity: "+newTrade.getQuantity()+"unit: "
+                +newTrade.getUnit()+"deliveryType: "+newTrade.getDeliveryType());
+        List<Trade> matches = tradeRepository.findByInstrumentIdAndStatusAndDirectionAndPriceAndQuantityAndUnitAndDeliveryType(
+                newTrade.getInstrumentId(),Status.OPEN,opposite, newTrade.getPrice(),
+                newTrade.getQuantity(),newTrade.getUnit(),newTrade.getDeliveryType());
+
+        System.out.println("matches: " + matches);
+        if (!matches.isEmpty()) {
+            Trade existingTrade = matches.getFirst();
+            matchTradePair(newTrade, existingTrade);
+        }
+        else  {
+            System.out.println("No matching trade found");
+        }
+
+    }
+
+    private void matchTradePair(Trade trade1, Trade trade2){
+        trade1.setMatchedTradeId(trade2.getId());
+        trade2.setMatchedTradeId(trade1.getId());
+
+        trade1.setStatus(Status.MATCHED);
+        trade2.setStatus(Status.MATCHED);
+
+        tradeRepository.save(trade1);
+        tradeRepository.save(trade2);
+
+    }
+
 
     public Trade updateTrade(UUID id, CreateTradeDTO createTradeDTO) {
         Trade trade = tradeRepository.findById(id).
                 orElseThrow(() -> new DataRetrievalFailureException(String.format("Trade with id %s not found", id)));
 
+        if(trade.getMatchedTradeId() != null){
+            unmatchTrade(trade);
+            System.out.print("unmatch trade " + trade.getMatchedTradeId());
+        }
         trade.setInstrumentId(createTradeDTO.getInstrumentId());
         trade.setAccountId(createTradeDTO.getAccountId());
         trade.setPrice(createTradeDTO.getPrice());
@@ -49,8 +94,33 @@ public class TradeService {
         trade.setUnit(createTradeDTO.getUnit());
         trade.setMatchedTradeId(createTradeDTO.getMatchedTradeId());
         trade.setStatus(createTradeDTO.getStatus());
-        return tradeRepository.save(trade);
+
+        Trade updatedTrade=tradeRepository.save(trade);
+
+        if(Status.OPEN.equals(updatedTrade.getStatus())){
+            matchWithExistingTrade(updatedTrade);
+        }
+
+        return updatedTrade;
     }
+
+
+    private void unmatchTrade(Trade trade){
+        if(trade.getMatchedTradeId() == null){
+            return;
+        }
+        Trade matchedTrade = tradeRepository.findById(trade.getMatchedTradeId()).orElseThrow(() -> new DataRetrievalFailureException("Matched trade not found"));
+
+        trade.setStatus(Status.OPEN);
+        matchedTrade.setStatus(Status.OPEN);
+
+        trade.setMatchedTradeId(null);
+        matchedTrade.setMatchedTradeId(null);
+
+        tradeRepository.save(trade);
+        tradeRepository.save(matchedTrade);
+    }
+
 
     public List<Trade> getAllTrades() {
         return tradeRepository.findAll();
@@ -64,9 +134,6 @@ public class TradeService {
         return tradeRepository.findByAccountId(accountId);
     }
 
-    public List<Trade> getAllTradesByInstrumentId(UUID instrumentId) {
-        return tradeRepository.findByInstrumentId(instrumentId);
-    }
 
     public void exerciseTrade(UUID tradeId, LocalDate currentDate) {
         Trade trade = tradeRepository.findById(tradeId)
@@ -87,43 +154,24 @@ public class TradeService {
         tradeRepository.save(trade);
     }
 
-    public void openTrade(UUID tradeId, LocalDate currentDate) {
-        Trade trade = tradeRepository.findById(tradeId)
-                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
-//        if(trade.getStatus()!= Status.MATCHED){
-//            throw new IllegalStateException("Trade status is NOT MATCHED, tradeId="+tradeId);
+
+//    public void matchTrade(UUID tradeId, LocalDate currentDate) {
+//        Trade trade = tradeRepository.findById(tradeId)
+//                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
+//        if(trade.getStatus()!= Status.OPEN){
+//            throw new IllegalStateException("Trade status is NOT OPEN, tradeId="+tradeId);
 //        }
-
-        Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
-                .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));
-
-        if(currentDate.isAfter(instrument.getMaturityDate())){
-            throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
-        }
-
-        trade.setStatus(Status.OPEN);
-        trade.setMatchedTradeId(null);
-        tradeRepository.save(trade);
-    }
-
-
-    public void matchTrade(UUID tradeId, LocalDate currentDate) {
-        Trade trade = tradeRepository.findById(tradeId)
-                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found, tradeId="+tradeId));
-        if(trade.getStatus()!= Status.OPEN){
-            throw new IllegalStateException("Trade status is NOT OPEN, tradeId="+tradeId);
-        }
-
-        Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
-                .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));
-
-        if(currentDate.isAfter(instrument.getMaturityDate())){
-            throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
-        }
-
-        trade.setStatus(Status.MATCHED);
-        tradeRepository.save(trade);
-    }
+//
+//        Instrument instrument = instrumentRepository.findById(trade.getInstrumentId())
+//                .orElseThrow(() -> new DataRetrievalFailureException("Instrument not found, tradeId="+tradeId));
+//
+//        if(currentDate.isAfter(instrument.getMaturityDate())){
+//            throw new IllegalStateException("Instrument maturity date is after current date, tradeId="+tradeId);
+//        }
+//
+//        trade.setStatus(Status.MATCHED);
+//        tradeRepository.save(trade);
+//    }
 
     public void closeExpiredTrades(LocalDate currentDate) {
         List<Trade> expiredTrades = tradeRepository.findExpiredTrades(currentDate);
@@ -133,15 +181,11 @@ public class TradeService {
         tradeRepository.saveAll(expiredTrades);
     }
 
-    public List<Trade> getOpenTrades(){
-        return tradeRepository.findByStatus(Status.OPEN);
-    }
-
     @Scheduled(cron = "0 0 17 * * ?")
     //@Scheduled(fixedDelay = 3000)
     public void triggerDailyBalanceCalculation() {
         System.out.println("Pokrećem dnevnu kalkulaciju...");
-        List<Trade> openTrades = tradeRepository.findByStatus(Status.OPEN);
+        List<Trade> openTrades = tradeRepository.findByStatus(Status.MATCHED);
         LocalDate currentDate = LocalDate.now();
 
         if(!openTrades.isEmpty()){
@@ -151,16 +195,16 @@ public class TradeService {
         closeExpiredTrades(currentDate);
     }
 
+
     public void deleteTrade(UUID id) {
-        if (!tradeRepository.existsById(id)) {
-            throw new DataRetrievalFailureException("Trade not found with id: " + id);
+        Trade trade = tradeRepository.findById(id)
+                .orElseThrow(() -> new DataRetrievalFailureException("Trade not found with id: " + id));
+
+        if (trade.getMatchedTradeId() != null) {
+            unmatchTrade(trade);
         }
+
         tradeRepository.deleteById(id);
     }
 
-    public List<Trade> findMatchableTrades(UUID instrumentId, Direction direction, double price, int quantity, Unit unit, DeliveryType deliveryType) {
-        Direction opposite = (direction == Direction.BUY) ? Direction.SELL : Direction.BUY;
-
-        return tradeRepository.findByInstrumentIdAndStatusAndDirectionAndPriceAndQuantityAndUnitAndDeliveryType(instrumentId,Status.OPEN, opposite,price,quantity, unit, deliveryType);
-    }
 }

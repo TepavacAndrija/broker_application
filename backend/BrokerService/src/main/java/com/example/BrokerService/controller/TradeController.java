@@ -55,17 +55,12 @@ public class TradeController {
         return ResponseEntity.of(tradeService.getTradeById(id));
     }
 
-    @PostMapping("/{id}/match")
-    public ResponseEntity<Trade> matchTrade(@PathVariable UUID id) {
-        tradeService.matchTrade(id, LocalDate.now());
-        return ResponseEntity.of(tradeService.getTradeById(id));
-    }
+//    @PostMapping("/{id}/match")
+//    public ResponseEntity<Trade> matchTrade(@PathVariable UUID id) {
+//        tradeService.matchTrade(id, LocalDate.now());
+//        return ResponseEntity.of(tradeService.getTradeById(id));
+//    }
 
-    @PostMapping("/{id}/open")
-    public ResponseEntity<Trade> openTrade(@PathVariable UUID id) {
-        tradeService.openTrade(id, LocalDate.now());
-        return ResponseEntity.of(tradeService.getTradeById(id));
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTrade(@PathVariable UUID id) {
@@ -73,11 +68,5 @@ public class TradeController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/matchable")
-    public ResponseEntity<List<Trade>> getMatchableTrades(@RequestBody CreateTradeDTO trade)
-    {
 
-        List<Trade> matchable = tradeService.findMatchableTrades(trade.getInstrumentId(), trade.getDirection(), trade.getPrice(), trade.getQuantity(), trade.getUnit(), trade.getDeliveryType());
-        return ResponseEntity.ok(matchable);
-    }
 }

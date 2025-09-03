@@ -105,34 +105,11 @@ export class TradeService {
     });
   }
 
-  exercise(id: string): Observable<TradeDTO> {
-    return this.http.post<TradeDTO>(
-      `${environment.apiUrl}/trades/${id}/exercise`,
-      {},
-      { withCredentials: true }
-    );
-  }
-  match(id: string): Observable<TradeDTO> {
-    return this.http.post<TradeDTO>(
-      `${environment.apiUrl}/trades/${id}/match`,
-      {},
-      { withCredentials: true }
-    );
-  }
-
-  open(id: string): Observable<TradeDTO> {
-    return this.http.post<TradeDTO>(
-      `${environment.apiUrl}/trades/${id}/open`,
-      {},
-      { withCredentials: true }
-    );
-  }
-
-  findMatchableTrades(dto: CreateTradeDTO): Observable<TradeDTO[]> {
-    return this.http.post<TradeDTO[]>(
-      `${environment.apiUrl}/trades/matchable`,
-      dto,
-      { withCredentials: true }
-    );
-  }
+  // match(id: string): Observable<TradeDTO> {
+  //   return this.http.post<TradeDTO>(
+  //     `${environment.apiUrl}/trades/${id}/match`,
+  //     {},
+  //     { withCredentials: true }
+  //   );
+  // }
 }
