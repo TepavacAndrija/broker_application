@@ -6,13 +6,23 @@ import { map } from 'rxjs';
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const isReverse = route.data['reverse'] || false;
+
   return authService.checkAuthStatus().pipe(
     map((isAuthenticated) => {
-      if (isAuthenticated) {
+      if (isReverse) {
+        if (isAuthenticated) {
+          router.navigate(['/dashboard']);
+          return false;
+        }
         return true;
       } else {
-        router.navigate(['/login']);
-        return false;
+        if (isAuthenticated) {
+          return true;
+        } else {
+          router.navigate(['/login']);
+          return false;
+        }
       }
     })
   );

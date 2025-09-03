@@ -15,7 +15,10 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul
+        class="navbar-nav me-auto mb-2 mb-lg-0"
+        *ngIf="authService.isLoggedIn$ | async"
+      >
         <li class="nav-item">
           <a
             class="nav-link"
@@ -59,7 +62,7 @@
         </li>
       </ul>
 
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center ms-auto">
         @if (authService.isLoggedIn$ | async) {
         <span class="text-white me-3">
           <small>

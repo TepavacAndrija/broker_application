@@ -8,7 +8,14 @@ import { AccountComponent } from './account/account.component';
 import { AccountStatusComponent } from './account-status/account-status.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [authGuard],
+    data: {
+      reverse: true,
+    },
+  },
   {
     path: 'dashboard',
     component: DashboardComponent,
