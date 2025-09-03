@@ -12,7 +12,6 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th>ID</th>
             <th>Instrument</th>
             <th>Account</th>
             <th>Direction</th>
@@ -25,9 +24,6 @@
         <tbody>
           @for (trade of trades; track trade.id) {
           <tr>
-            <td>
-              <small>{{ trade.id }}</small>
-            </td>
             <td>{{ trade.instrument.code }}</td>
             <td>{{ trade.account.name }}</td>
             <td>
@@ -83,9 +79,9 @@
     </div>
   </div>
 
-  <div class="mt-4">
+  <!-- <div class="mt-4">
     <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
-  </div>
+  </div> -->
 </div>
 
 @if (matchConfirmation) {
@@ -323,30 +319,6 @@
               name="price"
             />
           </div>
-
-          <!-- <div class="mb-3">
-            <label class="form-label">Unit</label>
-            <select
-              class="form-select"
-              [(ngModel)]="editingTrade.unit"
-              name="unit"
-            >
-              <option value="PER_UNIT">Per Unit</option>
-              <option value="PER_KG">Per KG</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Delivery Type</label>
-            <select
-              class="form-select"
-              [(ngModel)]="editingTrade.deliveryType"
-              name="deliveryType"
-            >
-              <option value="CASH">Cash</option>
-              <option value="DELIVERY">Delivery</option>
-            </select>
-          </div> -->
         </form>
       </div>
       <div class="modal-footer">

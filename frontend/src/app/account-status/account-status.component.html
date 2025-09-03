@@ -16,21 +16,15 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th>Account ID</th>
-            <th>Account Name</th>
-            <th>Date</th>
-            <th>OTE</th>
+            <th style="width: 40%">Account Name</th>
+            <th style="width: 40%">Date</th>
+            <th style="width: 20%">OTE</th>
           </tr>
         </thead>
         <tbody>
           @if (statuses && statuses.length > 0) { @for (status of statuses;
           track status.accountId) {
           <tr>
-            <td>
-              <small class="text-muted"
-                >{{ status.accountId | slice : 0 : 8 }}...</small
-              >
-            </td>
             <td>
               <strong>{{ getAccountName(status.accountId) }}</strong>
             </td>

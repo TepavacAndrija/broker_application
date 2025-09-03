@@ -12,18 +12,14 @@
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>User Info</th>
-            <th>Actions</th>
+            <th style="width: 40%">Name</th>
+            <th style="width: 40%">User Info</th>
+            <th style="width: 20%">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (acc of accounts; track acc.id) {
           <tr>
-            <td>
-              <small class="text-muted">{{ acc.id | slice : 0 : 8 }}...</small>
-            </td>
             <td>
               <strong>{{ acc.name }}</strong>
             </td>
