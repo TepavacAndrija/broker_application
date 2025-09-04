@@ -48,10 +48,12 @@ public class KafkaService {
     @KafkaListener(topics = "BalanceEventsAck", groupId = "BrokerGroup")
     public void handleOTEUpdate(byte[] responseByte) throws Exception {
         var response = OTEProto.OTEUpdateResponse.parseFrom(responseByte);
+        System.out.println("OTE update response: " + response);
         LocalDate date = LocalDate.parse(response.getDate());
         for (OTEProto.OTEUpdate oteUpdate : response.getAccountOteList()) {
             UUID accountId = UUID.fromString(oteUpdate.getAccountId());
             BigDecimal ote = BigDecimal.valueOf(oteUpdate.getOte());
+            System.out.println("Stigao za datum " + date + ": " +ote);
             accountStatusService.updateOTE(accountId, date, ote);
         }
     }

@@ -5,12 +5,16 @@ import com.example.protobuf.OTEProto;
 import com.example.protobuf.TradeProto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +43,7 @@ public class BalanceConsumer {
         Map<String, Double> accountOteMap = new HashMap<>();
 
         for(TradeProto.TradeEvent trade : a.getTradesList()){
-            if(!"OPEN".equals(trade.getStatus()))
+            if(!"MATCHED".equals(trade.getStatus()))
                 continue;
 
             Double marketPrice = prices.get(trade.getInstrumentId());
@@ -66,14 +70,15 @@ public class BalanceConsumer {
                         .build())
         );
 
+        System.out.println("account map evo ga = " + accountOteMap);
 
         kafkaTemplate.send("BalanceEventsAck", UUID.randomUUID().toString(), responseBuilder.build().toByteArray());
     }
 
-    private Map<String, Double> loadPricesFromCSV(String date){
+    private Map<String, Double> loadPricesFromCSV(String date) {
         Map<String, Double> result = new HashMap<>();
-        Path p = Paths.get(pricesCsvPath.replace("YYYY-MM-DD", date));
-        try(BufferedReader br = Files.newBufferedReader(p)){
+        ClassPathResource resource = new ClassPathResource(pricesCsvPath);
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while((line = br.readLine()) != null){
                 String[] lineSplit = line.split(",");
