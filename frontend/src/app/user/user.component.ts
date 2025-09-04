@@ -4,6 +4,8 @@ import { UserDTO } from '../models/user.dto';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 import { FormsModule } from '@angular/forms';
+import * as Stomp from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-user',
@@ -15,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 export class UserComponent implements OnInit {
   users: UserDTO[] = [];
   editingUser: UserDTO | null = null;
+  private client!: Stomp.Client;
 
   showCreateModal = false;
 
@@ -25,6 +28,37 @@ export class UserComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.connectWebSocket();
+  }
+
+  connectWebSocket() {
+    this.client = new Stomp.Client({
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      connectHeaders: {},
+      debug: (str) => {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log(' Connected websocket');
+
+        this.client.subscribe('/topic/users', (message) => {
+          console.log('user:', JSON.parse(message.body));
+          this.loadUsers();
+        });
+
+        this.client.subscribe('/topic/users/deleted', (message: any) => {
+          const deletedAccountId = message.body;
+          console.log('Deleted:', deletedAccountId);
+          this.loadUsers();
+        });
+      },
+      onStompError: (error) => {
+        console.error('STOMP Error:', error);
+      },
+    });
+
+    this.client.activate();
   }
 
   loadUsers(): void {
@@ -36,7 +70,7 @@ export class UserComponent implements OnInit {
   deleteUser(id: string): void {
     if (confirm('Delete?')) {
       this.userService.delete(id).subscribe(() => {
-        this.loadUsers();
+        // this.loadUsers();
       });
     }
   }
@@ -60,7 +94,7 @@ export class UserComponent implements OnInit {
         nameInput.value = '';
         passwordInput.value = '';
         roleInput.value = 'BROKER';
-        this.loadUsers();
+        // this.loadUsers();
       },
       error: (err) => {
         alert('Error while creating the user');
@@ -81,7 +115,7 @@ export class UserComponent implements OnInit {
     this.userService.update(id, { name, role }).subscribe({
       next: () => {
         this.cancelEdit();
-        this.loadUsers();
+        // this.loadUsers();
       },
       error: (e) => {
         alert('Error while updating');
