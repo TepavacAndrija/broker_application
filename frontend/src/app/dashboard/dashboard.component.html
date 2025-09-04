@@ -5,8 +5,13 @@
   <button class="btn btn-primary mb-3" (click)="showCreateModal = true">
     + New trade
   </button>
-  }
-
+  } @if (isLoading) {
+  <div class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading trades...</span>
+    </div>
+  </div>
+  } @if (!isLoading && trades && trades.length > 0){
   <div class="card shadow-sm">
     <div class="card-body">
       <table class="table table-striped table-hover">
@@ -85,10 +90,11 @@
       </table>
     </div>
   </div>
-
-  <!-- <div class="mt-4">
-    <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
-  </div> -->
+  } @if (!isLoading && trades && trades.length === 0) {
+  <div class="alert alert-info">
+    No trades found. Create a new trade to get started.
+  </div>
+  }
 </div>
 
 @if (matchConfirmation) {

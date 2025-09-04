@@ -158,16 +158,24 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+  isLoading = true;
 
   loadAllData(): void {
+    this.isLoading = true;
     combineLatest({
       allTrades: this.tradeService.getTradeViews(),
       allAccounts: this.accountService.getAll(),
       allInstruments: this.instrumentService.getAll(),
-    }).subscribe(({ allTrades, allAccounts, allInstruments }) => {
-      this.trades = allTrades;
-      this.accounts = allAccounts;
-      this.instruments = allInstruments;
+    }).subscribe({
+      next: ({ allTrades, allAccounts, allInstruments }) => {
+        this.trades = allTrades;
+        this.accounts = allAccounts;
+        this.instruments = allInstruments;
+        this.isLoading = false;
+      },
+      error: (e) => {
+        this.isLoading = false;
+      },
     });
   }
 
@@ -237,10 +245,10 @@ export class DashboardComponent implements OnInit {
     this.tradeService.exercise(id).subscribe();
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+  // logout() {
+  //   this.authService.logout();
+  //   this.router.navigate(['/login']);
+  // }
 
   isManager(): boolean {
     return this.authService.getRole() === 'MANAGER';
