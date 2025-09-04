@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +30,7 @@ public class AccountStatusController {
             @PathVariable UUID accountId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
     {
-        return ResponseEntity.of(accountStatusService.findByAccountIdAndDate(accountId, date));
+        return ResponseEntity.of(accountStatusService.findByAccountIdAndDate(accountId, date.atTime(LocalTime.NOON)));
     }
 
     @GetMapping("/date/{date}")

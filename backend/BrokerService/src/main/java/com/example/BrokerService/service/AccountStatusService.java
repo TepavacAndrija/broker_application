@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -20,13 +21,15 @@ public class AccountStatusService {
 
     private final AccountStatusRepository accountStatusRepository;
 
-    public Optional<AccountStatus> findByAccountIdAndDate(UUID accountId, LocalDate date) {
+    public Optional<AccountStatus> findByAccountIdAndDate(UUID accountId, LocalDateTime date) {
         return accountStatusRepository.findByAccountIdAndDate(accountId,date);
     }
 
     public void updateOTE(UUID accountId, LocalDate date, BigDecimal ote) {
+
+
         AccountStatus status = accountStatusRepository
-                .findByAccountIdAndDate(accountId,date)
+                .findByAccountIdAndDate(accountId,date.atTime(LocalTime.NOON))
                 .orElseGet(()->{
                     AccountStatus newStatus = new AccountStatus();
                     newStatus.setId(UUID.randomUUID());
