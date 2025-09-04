@@ -25,7 +25,7 @@ public class TradeController {
     @PostMapping
     public ResponseEntity<Trade> createTrade(@RequestBody CreateTradeDTO tradeDTO) {
         Trade trade = tradeService.createTrade(tradeDTO);
-        notifyFrontend(trade);
+        messagingTemplate.convertAndSend("/topic/trades", trade);
         return ResponseEntity.ok(trade);
     }
 
@@ -42,7 +42,7 @@ public class TradeController {
     @PutMapping("/{id}")
     public ResponseEntity<Trade> updateTradeById(@PathVariable UUID id, @RequestBody CreateTradeDTO tradeDTO) {
         Trade updatedTrade = tradeService.updateTrade(id, tradeDTO);
-        notifyFrontend(updatedTrade);
+        messagingTemplate.convertAndSend("/topic/trades/update", updatedTrade);
         return ResponseEntity.ok(updatedTrade);
     }
 
@@ -56,7 +56,7 @@ public class TradeController {
         try {
             tradeService.exerciseTrade(id, LocalDate.now());
             Trade exercisedTrade = tradeService.getTradeById(id).orElseThrow();
-            notifyFrontend(exercisedTrade);
+            messagingTemplate.convertAndSend("/topic/trades/exercise", exercisedTrade);
             return ResponseEntity.ok(exercisedTrade);
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());
@@ -82,11 +82,6 @@ public class TradeController {
         tradeService.deleteTrade(id);
         messagingTemplate.convertAndSend("/topic/trades/deleted", id.toString());
         return ResponseEntity.noContent().build();
-    }
-
-
-    private void notifyFrontend(Trade trade) {
-        messagingTemplate.convertAndSend("/topic/trades", trade);
     }
 
 }

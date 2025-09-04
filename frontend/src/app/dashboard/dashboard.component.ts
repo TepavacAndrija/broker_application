@@ -12,6 +12,7 @@ import { AccountDTO } from '../models/account.dto';
 import { InstrumentDTO } from '../models/instrument.dto';
 import * as Stomp from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { NotificationService } from '../notification/notification.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +27,8 @@ export class DashboardComponent implements OnInit {
     private router: Router,
     private tradeService: TradeService,
     private accountService: AccountService,
-    private instrumentService: InstrumentService
+    private instrumentService: InstrumentService,
+    private notificationService: NotificationService
   ) {}
 
   trades: TradeView[] = [];
@@ -81,13 +83,37 @@ export class DashboardComponent implements OnInit {
         console.log(' Connected to WebSocket');
 
         this.client.subscribe('/topic/trades', (message) => {
-          console.log('Trgovina:', JSON.parse(message.body));
+          const trade = JSON.parse(message.body);
+          this.notificationService.showInfo(
+            'Succesfully created trade with ID ' + trade.id
+          );
+
+          this.loadAllData();
+        });
+
+        this.client.subscribe('/topic/trades/update', (message) => {
+          const trade = JSON.parse(message.body);
+          this.notificationService.showEdit(
+            'Succesfully edited trade with ID ' + trade.id
+          );
+
+          this.loadAllData();
+        });
+
+        this.client.subscribe('/topic/trades/exercise', (message) => {
+          const trade = JSON.parse(message.body);
+          this.notificationService.showExercise(
+            'Succesfully exercised selected trades!'
+          );
+
           this.loadAllData();
         });
 
         this.client.subscribe('/topic/trades/deleted', (message: any) => {
-          const deletedTradeId = message.body;
-          console.log('Deleted:', deletedTradeId);
+          this.notificationService.showWarning(
+            `Trade with ID ${message.body} has been deleted`,
+            'Trade Deleted'
+          );
           this.loadAllData();
         });
       },
@@ -100,7 +126,7 @@ export class DashboardComponent implements OnInit {
   }
 
   startEdit(trade: TradeView): void {
-    console.log('Pokrenut edit');
+    // console.log('Stareted edit');
     this.editingTrade = { ...trade };
   }
 
@@ -122,15 +148,9 @@ export class DashboardComponent implements OnInit {
 
     this.tradeService.update(dto).subscribe({
       next: (updatedTrade) => {
-        console.log(
-          'Trade updated successfully. Match status:',
-          updatedTrade.status
-        );
         this.cancelEdit();
-        // this.loadAllData();
       },
       error: (e) => {
-        alert('Error while updating');
         console.error(e);
       },
     });
@@ -157,10 +177,8 @@ export class DashboardComponent implements OnInit {
       next: () => {
         this.showCreateModal = false;
         this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
-        // this.loadAllData();
       },
       error: (e) => {
-        alert('Error creating new trade');
         console.error(e);
       },
     });
@@ -197,13 +215,10 @@ export class DashboardComponent implements OnInit {
 
     this.tradeService.create(matching).subscribe({
       next: () => {
-        alert('Trade matched successfully!');
-        // this.loadAllData();
         this.cancelMatch();
       },
       error: (err) => {
         console.error('Error during match process:', err);
-        alert('Error during match process. Please check console for details.');
         this.loadAllData();
       },
     });
@@ -216,17 +231,7 @@ export class DashboardComponent implements OnInit {
   exerciseTrade(id: string): void {
     if (!confirm('Are you sure you want to exercise this trade?')) return;
 
-    this.tradeService.exercise(id).subscribe({
-      next: () => {
-        alert('Trade exercised successfully!');
-        // this.loadAllData();
-      },
-      error: (err) => {
-        console.error('Error exercising trade:', err);
-        alert('Error exercising trade. Please check console for details.');
-        this.loadAllData();
-      },
-    });
+    this.tradeService.exercise(id).subscribe();
   }
 
   logout() {
