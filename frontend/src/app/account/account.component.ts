@@ -6,6 +6,7 @@ import { AccountService } from './account.service';
 import { AuthService } from '../auth/auth.service';
 import * as Stomp from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { NotificationService } from '../notification/notification.service';
 
 @Component({
   selector: 'app-account',
@@ -21,7 +22,8 @@ export class AccountComponent implements OnInit {
 
   constructor(
     private accountService: AccountService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -42,13 +44,28 @@ export class AccountComponent implements OnInit {
         console.log(' Connected to WebSocket');
 
         this.client.subscribe('/topic/accounts', (message) => {
-          console.log('Account:', JSON.parse(message.body));
+          const account = JSON.parse(message.body);
+          this.notificationService.showInfo(
+            'Succesfully created account with ID ' + account.id
+          );
+
+          this.loadAccounts();
+        });
+
+        this.client.subscribe('/topic/accounts/update', (message) => {
+          const account = JSON.parse(message.body);
+          this.notificationService.showEdit(
+            'Succesfully updated account with ID ' + account.id
+          );
+
           this.loadAccounts();
         });
 
         this.client.subscribe('/topic/accounts/deleted', (message: any) => {
-          const deletedAccountId = message.body;
-          console.log('Deleted:', deletedAccountId);
+          this.notificationService.showWarning(
+            `Account with ID ${message.body} has been deleted`,
+            'Trade Deleted'
+          );
           this.loadAccounts();
         });
       },

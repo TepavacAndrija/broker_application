@@ -39,7 +39,7 @@ public class AccountController {
             @PathVariable UUID id,
             @RequestBody CreateAccountDTO request) {
         Account updateAccount = accountService.updateAccount(id, request);
-        messagingTemplate.convertAndSend("/topic/accounts", updateAccount);
+        messagingTemplate.convertAndSend("/topic/accounts/update", updateAccount);
         return ResponseEntity.ok(accountService.updateAccount(id, request));
     }
     @GetMapping("/{id}")
