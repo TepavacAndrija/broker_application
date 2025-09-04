@@ -177,6 +177,23 @@ export class DashboardComponent implements OnInit {
   cancelMatch(): void {
     this.matchConfirmation = null;
   }
+
+  exerciseTrade(id: string): void {
+    if (!confirm('Are you sure you want to exercise this trade?')) return;
+
+    this.tradeService.exercise(id).subscribe({
+      next: () => {
+        alert('Trade exercised successfully!');
+        this.loadAllData();
+      },
+      error: (err) => {
+        console.error('Error exercising trade:', err);
+        alert('Error exercising trade. Please check console for details.');
+        this.loadAllData();
+      },
+    });
+  }
+
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);

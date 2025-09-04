@@ -78,13 +78,34 @@
 
 	</dependencies>
 
-	<!-- <repositories>
-		<repository>
-			<id>confluent</id>
-			<url>https://packages.confluent.io/maven/</url>
-		</repository>
-	</repositories> -->
-
+	 <repositories>
+<!--		<repository>-->
+<!--			<id>confluent</id>-->
+<!--			<url>https://packages.confluent.io/maven/</url>-->
+<!--		</repository>-->
+		 <repository>
+			 <id>confluent</id>
+			 <url>file://${project.basedir}/maven-repo-dummy</url>
+			 <releases>
+				 <enabled>false</enabled>
+			 </releases>
+			 <snapshots>
+				 <enabled>false</enabled>
+			 </snapshots>
+		 </repository>
+	</repositories>
+<pluginRepositories>
+	<pluginRepository>
+		<id>confluent</id>
+		<url>file://${project.basedir}/maven-repo-dummy</url>
+		<releases>
+			<enabled>false</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</pluginRepository>
+</pluginRepositories>
 	<build>
 		<plugins>
 			<plugin>

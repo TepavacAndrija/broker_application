@@ -5,6 +5,7 @@ import com.example.BrokerService.model.Trade;
 import com.example.BrokerService.service.CreateTradeDTO;
 import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/trades")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('MANAGER')")
 public class TradeController {
     private final TradeService tradeService;
 
@@ -26,7 +26,6 @@ public class TradeController {
         return ResponseEntity.ok(trade);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<Trade>> getAllTrades() {
         return ResponseEntity.ok(tradeService.getAllTrades());
@@ -37,7 +36,6 @@ public class TradeController {
         return ResponseEntity.of(tradeService.getTradeById(id));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ResponseEntity<Trade> updateTradeById(@PathVariable UUID id, @RequestBody CreateTradeDTO tradeDTO) {
         Trade updatedTrade = tradeService.updateTrade(id, tradeDTO);
@@ -51,8 +49,19 @@ public class TradeController {
 
     @PostMapping("/{id}/exercise")
     public ResponseEntity<Trade> exerciseTrade(@PathVariable UUID id) {
-        tradeService.exerciseTrade(id, LocalDate.now());
-        return ResponseEntity.of(tradeService.getTradeById(id));
+        try {
+            tradeService.exerciseTrade(id, LocalDate.now());
+            return ResponseEntity.ok(tradeService.getTradeById(id).orElseThrow());
+        } catch (IllegalStateException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.badRequest().body(null);
+        } catch (DataRetrievalFailureException e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
     }
 
 //    @PostMapping("/{id}/match")

@@ -105,6 +105,16 @@ export class TradeService {
     });
   }
 
+  exercise(id: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/trades/${id}/exercise`,
+      id,
+      {
+        withCredentials: true,
+      }
+    );
+  }
+
   // match(id: string): Observable<TradeDTO> {
   //   return this.http.post<TradeDTO>(
   //     `${environment.apiUrl}/trades/${id}/match`,

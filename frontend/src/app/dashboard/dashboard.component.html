@@ -70,6 +70,13 @@
               >
                 Match
               </button>
+              } @if (trade.status === 'MATCHED') {
+              <button
+                class="btn btn-sm btn-outline-info"
+                (click)="exerciseTrade(trade.id)"
+              >
+                Exercise
+              </button>
               }
             </td>
           </tr>
