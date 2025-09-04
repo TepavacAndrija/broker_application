@@ -97,10 +97,8 @@ export class InstrumentComponent implements OnInit {
       this.instrumentService.update(id, dto).subscribe({
         next: () => {
           this.cancelEdit();
-          // this.loadInstruments();
         },
         error: (e) => {
-          alert('Error while updating');
           console.error(e);
         },
       });
@@ -108,10 +106,8 @@ export class InstrumentComponent implements OnInit {
       this.instrumentService.create(dto).subscribe({
         next: () => {
           this.cancelEdit();
-          // this.loadInstruments();
         },
         error: (e) => {
-          alert('Error while creating');
           console.error(e);
         },
       });
@@ -124,9 +120,7 @@ export class InstrumentComponent implements OnInit {
 
   deleteInstrument(id: string): void {
     if (confirm('Delete?')) {
-      this.instrumentService.delete(id).subscribe(() => {
-        // this.loadInstruments();
-      });
+      this.instrumentService.delete(id).subscribe(() => {});
     }
   }
   isManager(): boolean {

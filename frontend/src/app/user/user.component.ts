@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import * as Stomp from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { NotificationService } from '../notification/notification.service';
 
 @Component({
   selector: 'app-user',
@@ -23,7 +24,8 @@ export class UserComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -43,13 +45,29 @@ export class UserComponent implements OnInit {
         console.log(' Connected websocket');
 
         this.client.subscribe('/topic/users', (message) => {
-          console.log('user:', JSON.parse(message.body));
+          const user = JSON.parse(message.body);
+          this.notificationService.showInfo(
+            'Succesfully created user with ID ' + user.id,
+            'User created'
+          );
+          this.loadUsers();
+        });
+
+        this.client.subscribe('/topic/users/update', (message) => {
+          const user = JSON.parse(message.body);
+          this.notificationService.showInfo(
+            'Succesfully edited user with ID ' + user.id,
+            'User updated'
+          );
           this.loadUsers();
         });
 
         this.client.subscribe('/topic/users/deleted', (message: any) => {
           const deletedAccountId = message.body;
-          console.log('Deleted:', deletedAccountId);
+          this.notificationService.showWarning(
+            `User with ID ${message.body} has been deleted`,
+            'User Deleted'
+          );
           this.loadUsers();
         });
       },
@@ -69,9 +87,7 @@ export class UserComponent implements OnInit {
 
   deleteUser(id: string): void {
     if (confirm('Delete?')) {
-      this.userService.delete(id).subscribe(() => {
-        // this.loadUsers();
-      });
+      this.userService.delete(id).subscribe(() => {});
     }
   }
 
@@ -85,7 +101,6 @@ export class UserComponent implements OnInit {
     const role = roleInput.value as 'MANAGER' | 'BROKER';
 
     if (!name || !password) {
-      alert('Name and password required');
       return;
     }
 
@@ -94,10 +109,8 @@ export class UserComponent implements OnInit {
         nameInput.value = '';
         passwordInput.value = '';
         roleInput.value = 'BROKER';
-        // this.loadUsers();
       },
       error: (err) => {
-        alert('Error while creating the user');
         console.error(err);
       },
     });
@@ -115,10 +128,8 @@ export class UserComponent implements OnInit {
     this.userService.update(id, { name, role }).subscribe({
       next: () => {
         this.cancelEdit();
-        // this.loadUsers();
       },
       error: (e) => {
-        alert('Error while updating');
         console.error(e);
       },
     });

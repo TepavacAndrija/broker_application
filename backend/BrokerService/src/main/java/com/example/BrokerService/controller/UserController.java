@@ -38,7 +38,7 @@ public class UserController {
     @PostMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody UpdateUserDTO userDTO) {
         User updatedUser = userService.updateUser(id,userDTO);
-        messagingTemplate.convertAndSend("/topic/users", updatedUser);
+        messagingTemplate.convertAndSend("/topic/users/update", updatedUser);
         return ResponseEntity.ok(updatedUser);
     }
     @GetMapping

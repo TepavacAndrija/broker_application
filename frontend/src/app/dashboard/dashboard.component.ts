@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
         this.client.subscribe('/topic/trades/update', (message) => {
           const trade = JSON.parse(message.body);
           this.notificationService.showEdit(
-            'Succesfully edited trade with ID ' + trade.id,
+            'Succesfully updated trade with ID ' + trade.id,
             'Trade updated'
           );
 
