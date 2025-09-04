@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { AccountDTO } from '../models/account.dto';
 import { AccountService } from './account.service';
 import { AuthService } from '../auth/auth.service';
+import * as Stomp from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-account',
@@ -15,6 +17,7 @@ import { AuthService } from '../auth/auth.service';
 export class AccountComponent implements OnInit {
   accounts: AccountDTO[] = [];
   editingAccount: AccountDTO | null = null;
+  private client!: Stomp.Client;
 
   constructor(
     private accountService: AccountService,
@@ -23,6 +26,37 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+    this.connectWebSocket();
+  }
+
+  connectWebSocket() {
+    this.client = new Stomp.Client({
+      // brokerURL: 'ws://localhost:8080/ws',
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      connectHeaders: {},
+      debug: (str) => {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log(' Connected to WebSocket');
+
+        this.client.subscribe('/topic/accounts', (message) => {
+          console.log('Account:', JSON.parse(message.body));
+          this.loadAccounts();
+        });
+
+        this.client.subscribe('/topic/accounts/deleted', (message: any) => {
+          const deletedAccountId = message.body;
+          console.log('Deleted:', deletedAccountId);
+          this.loadAccounts();
+        });
+      },
+      onStompError: (error) => {
+        console.error('STOMP Error:', error);
+      },
+    });
+    this.client.activate();
   }
 
   loadAccounts(): void {
@@ -48,7 +82,7 @@ export class AccountComponent implements OnInit {
       this.accountService.update(id, dto).subscribe({
         next: () => {
           this.cancelEdit();
-          this.loadAccounts();
+          // this.loadAccounts();
         },
         error: (err) => {
           alert('Error while updatin account');
@@ -59,7 +93,7 @@ export class AccountComponent implements OnInit {
       this.accountService.create(dto).subscribe({
         next: () => {
           this.cancelEdit();
-          this.loadAccounts();
+          // this.loadAccounts();
         },
         error: (err) => {
           alert('Error while creating account');
@@ -75,9 +109,7 @@ export class AccountComponent implements OnInit {
 
   deleteAccount(id: string): void {
     if (confirm('Delete account?')) {
-      this.accountService.delete(id).subscribe(() => {
-        this.loadAccounts();
-      });
+      this.accountService.delete(id).subscribe();
     }
   }
 
