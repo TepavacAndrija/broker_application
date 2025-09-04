@@ -85,7 +85,8 @@ export class DashboardComponent implements OnInit {
         this.client.subscribe('/topic/trades', (message) => {
           const trade = JSON.parse(message.body);
           this.notificationService.showInfo(
-            'Succesfully created trade with ID ' + trade.id
+            'Succesfully created trade with ID ' + trade.id,
+            'Trade Created'
           );
 
           this.loadAllData();
@@ -94,7 +95,8 @@ export class DashboardComponent implements OnInit {
         this.client.subscribe('/topic/trades/update', (message) => {
           const trade = JSON.parse(message.body);
           this.notificationService.showEdit(
-            'Succesfully edited trade with ID ' + trade.id
+            'Succesfully edited trade with ID ' + trade.id,
+            'Trade updated'
           );
 
           this.loadAllData();
@@ -103,7 +105,8 @@ export class DashboardComponent implements OnInit {
         this.client.subscribe('/topic/trades/exercise', (message) => {
           const trade = JSON.parse(message.body);
           this.notificationService.showExercise(
-            'Succesfully exercised selected trades!'
+            'Succesfully exercised selected trades!',
+            'Trades exercised'
           );
 
           this.loadAllData();

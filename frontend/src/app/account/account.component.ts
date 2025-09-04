@@ -46,7 +46,8 @@ export class AccountComponent implements OnInit {
         this.client.subscribe('/topic/accounts', (message) => {
           const account = JSON.parse(message.body);
           this.notificationService.showInfo(
-            'Succesfully created account with ID ' + account.id
+            'Succesfully created account with ID ' + account.id,
+            'Account Created'
           );
 
           this.loadAccounts();
@@ -55,7 +56,8 @@ export class AccountComponent implements OnInit {
         this.client.subscribe('/topic/accounts/update', (message) => {
           const account = JSON.parse(message.body);
           this.notificationService.showEdit(
-            'Succesfully updated account with ID ' + account.id
+            'Succesfully updated account with ID ' + account.id,
+            'Account Updated'
           );
 
           this.loadAccounts();
@@ -64,7 +66,7 @@ export class AccountComponent implements OnInit {
         this.client.subscribe('/topic/accounts/deleted', (message: any) => {
           this.notificationService.showWarning(
             `Account with ID ${message.body} has been deleted`,
-            'Trade Deleted'
+            'Account Deleted'
           );
           this.loadAccounts();
         });
@@ -99,10 +101,8 @@ export class AccountComponent implements OnInit {
       this.accountService.update(id, dto).subscribe({
         next: () => {
           this.cancelEdit();
-          // this.loadAccounts();
         },
         error: (err) => {
-          alert('Error while updatin account');
           console.error(err);
         },
       });
@@ -110,10 +110,8 @@ export class AccountComponent implements OnInit {
       this.accountService.create(dto).subscribe({
         next: () => {
           this.cancelEdit();
-          // this.loadAccounts();
         },
         error: (err) => {
-          alert('Error while creating account');
           console.error(err);
         },
       });

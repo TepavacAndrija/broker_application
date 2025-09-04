@@ -6,6 +6,7 @@ import { InstrumentService } from './instrument.service';
 import { AuthService } from '../auth/auth.service';
 import * as Stomp from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { NotificationService } from '../notification/notification.service';
 
 @Component({
   selector: 'app-instrument',
@@ -21,7 +22,8 @@ export class InstrumentComponent implements OnInit {
 
   constructor(
     private instrumentService: InstrumentService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -44,15 +46,29 @@ export class InstrumentComponent implements OnInit {
       },
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log('Connected to Websocket');
         this.client.subscribe('/topic/instruments', (message) => {
-          console.log('Instrumen:', JSON.parse(message.body));
+          const instrument = JSON.parse(message.body);
+          this.notificationService.showInfo(
+            'Succesfully created instrument with ID ' + instrument.id,
+            'Instrument created'
+          );
+          this.loadInstruments();
+        });
+        this.client.subscribe('/topic/instruments/update', (message) => {
+          const instrument = JSON.parse(message.body);
+          this.notificationService.showEdit(
+            'Succesfully updated instrument with ID ' + instrument.id,
+            'Instrument updated'
+          );
           this.loadInstruments();
         });
 
         this.client.subscribe('/topic/instruments/deleted', (message: any) => {
           const deletedInstrumentId = message.body;
-          console.log('Deleted:', deletedInstrumentId);
+          this.notificationService.showWarning(
+            `Instrument with ID ${message.body} has been deleted`,
+            'Instrument Deleted'
+          );
           this.loadInstruments();
         });
       },

@@ -37,7 +37,7 @@ public class InstrumentController {
     @PutMapping("/{id}")
     public ResponseEntity<Instrument> updateInstrument(@PathVariable UUID id, @RequestBody CreateInstrumentDTO instrumentDTO) {
         Instrument updated = instrumentService.updateInstrument(id, instrumentDTO);
-        messagingTemplate.convertAndSend("/topic/instruments", updated);
+        messagingTemplate.convertAndSend("/topic/instruments/update", updated);
         return ResponseEntity.ok(updated);
     }
 
