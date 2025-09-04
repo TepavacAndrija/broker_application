@@ -5,6 +5,7 @@ import com.example.BrokerService.service.CreateInstrumentDTO;
 import com.example.BrokerService.service.InstrumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +19,13 @@ import java.util.UUID;
 public class InstrumentController {
 
     private final InstrumentService instrumentService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping
     public ResponseEntity<Instrument> createInstrument(@RequestBody CreateInstrumentDTO instrumentDTO) {
-        return ResponseEntity.ok(instrumentService.createInstrument(instrumentDTO));
+        Instrument instrument = instrumentService.createInstrument(instrumentDTO);
+        messagingTemplate.convertAndSend("/topic/instruments", instrument);
+        return ResponseEntity.ok(instrument);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -33,6 +37,7 @@ public class InstrumentController {
     @PutMapping("/{id}")
     public ResponseEntity<Instrument> updateInstrument(@PathVariable UUID id, @RequestBody CreateInstrumentDTO instrumentDTO) {
         Instrument updated = instrumentService.updateInstrument(id, instrumentDTO);
+        messagingTemplate.convertAndSend("/topic/instruments", updated);
         return ResponseEntity.ok(updated);
     }
 
@@ -44,6 +49,7 @@ public class InstrumentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInstrument(@PathVariable UUID id) {
         instrumentService.deleteInstrument(id);
+        messagingTemplate.convertAndSend("/topic/instruments/deleted", id.toString());
         return ResponseEntity.noContent().build();
     }
 }
