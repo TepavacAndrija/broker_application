@@ -7,6 +7,7 @@ import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +20,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TradeController {
     private final TradeService tradeService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping
     public ResponseEntity<Trade> createTrade(@RequestBody CreateTradeDTO tradeDTO) {
         Trade trade = tradeService.createTrade(tradeDTO);
+        notifyFrontend(trade);
         return ResponseEntity.ok(trade);
     }
 
@@ -39,6 +42,7 @@ public class TradeController {
     @PutMapping("/{id}")
     public ResponseEntity<Trade> updateTradeById(@PathVariable UUID id, @RequestBody CreateTradeDTO tradeDTO) {
         Trade updatedTrade = tradeService.updateTrade(id, tradeDTO);
+        notifyFrontend(updatedTrade);
         return ResponseEntity.ok(updatedTrade);
     }
 
@@ -51,7 +55,9 @@ public class TradeController {
     public ResponseEntity<Trade> exerciseTrade(@PathVariable UUID id) {
         try {
             tradeService.exerciseTrade(id, LocalDate.now());
-            return ResponseEntity.ok(tradeService.getTradeById(id).orElseThrow());
+            Trade exercisedTrade = tradeService.getTradeById(id).orElseThrow();
+            notifyFrontend(exercisedTrade);
+            return ResponseEntity.ok(exercisedTrade);
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());
             return ResponseEntity.badRequest().body(null);
@@ -74,8 +80,13 @@ public class TradeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTrade(@PathVariable UUID id) {
         tradeService.deleteTrade(id);
+        messagingTemplate.convertAndSend("/topic/trades/deleted", id.toString());
         return ResponseEntity.noContent().build();
     }
 
+
+    private void notifyFrontend(Trade trade) {
+        messagingTemplate.convertAndSend("/topic/trades", trade);
+    }
 
 }

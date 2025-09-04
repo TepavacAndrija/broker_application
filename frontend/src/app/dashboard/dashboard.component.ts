@@ -10,6 +10,8 @@ import { AccountService } from '../account/account.service';
 import { InstrumentService } from '../instrument/instrument.service';
 import { AccountDTO } from '../models/account.dto';
 import { InstrumentDTO } from '../models/instrument.dto';
+import * as Stomp from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,6 +34,7 @@ export class DashboardComponent implements OnInit {
   instruments: InstrumentDTO[] = [];
   editingTrade: TradeView | null = null;
   showCreateModal = false;
+  private client!: Stomp.Client;
 
   newTrade = {
     accountId: '',
@@ -62,6 +65,38 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAllData();
+    this.connectWebSocket();
+  }
+
+  connectWebSocket() {
+    this.client = new Stomp.Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      connectHeaders: {},
+      debug: (str) => {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log(' Connected to WebSocket');
+
+        this.client.subscribe('/topic/trades', (message) => {
+          console.log('Trgovina:', JSON.parse(message.body));
+          this.loadAllData();
+        });
+
+        this.client.subscribe('/topic/trades/deleted', (message: any) => {
+          const deletedTradeId = message.body;
+          console.log('Deleted:', deletedTradeId);
+          this.loadAllData();
+        });
+      },
+      onStompError: (error) => {
+        console.error('STOMP Error:', error);
+      },
+    });
+
+    this.client.activate();
   }
 
   startEdit(trade: TradeView): void {
@@ -92,7 +127,7 @@ export class DashboardComponent implements OnInit {
           updatedTrade.status
         );
         this.cancelEdit();
-        this.loadAllData();
+        // this.loadAllData();
       },
       error: (e) => {
         alert('Error while updating');
@@ -122,7 +157,7 @@ export class DashboardComponent implements OnInit {
       next: () => {
         this.showCreateModal = false;
         this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
-        this.loadAllData();
+        // this.loadAllData();
       },
       error: (e) => {
         alert('Error creating new trade');
@@ -133,7 +168,7 @@ export class DashboardComponent implements OnInit {
 
   deleteTrade(id: string): void {
     if (!confirm('Delete trade?')) return;
-    this.tradeService.delete(id).subscribe(() => this.loadAllData());
+    this.tradeService.delete(id).subscribe();
   }
 
   confirmMatch(trade: TradeView): void {
@@ -163,7 +198,7 @@ export class DashboardComponent implements OnInit {
     this.tradeService.create(matching).subscribe({
       next: () => {
         alert('Trade matched successfully!');
-        this.loadAllData();
+        // this.loadAllData();
         this.cancelMatch();
       },
       error: (err) => {
@@ -184,7 +219,7 @@ export class DashboardComponent implements OnInit {
     this.tradeService.exercise(id).subscribe({
       next: () => {
         alert('Trade exercised successfully!');
-        this.loadAllData();
+        // this.loadAllData();
       },
       error: (err) => {
         console.error('Error exercising trade:', err);
