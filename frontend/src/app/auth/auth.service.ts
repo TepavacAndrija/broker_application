@@ -11,6 +11,7 @@ import {
 } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Role } from '../models/user.dto';
+import { Router } from '@angular/router';
 
 export interface AuthDTO {
   name: string;
@@ -27,7 +28,7 @@ export class AuthService {
   isLoggedIn$ = this.loggedIn.asObservable();
   public user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.checkAuthStatus().subscribe();
   }
 
@@ -69,7 +70,9 @@ export class AuthService {
         { withCredentials: true }
       )
       .subscribe({
-        next: () => this.loggedIn.next(false),
+        next: () => {
+          this.loggedIn.next(false), this.router.navigate(['/login']);
+        },
       });
   }
 
