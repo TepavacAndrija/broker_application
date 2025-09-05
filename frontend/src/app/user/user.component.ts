@@ -19,7 +19,7 @@ export class UserComponent implements OnInit {
   users: UserDTO[] = [];
   editingUser: UserDTO | null = null;
   private client!: Stomp.Client;
-
+  isLoading: boolean = true;
   showCreateModal = false;
 
   constructor(
@@ -80,8 +80,15 @@ export class UserComponent implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getAll().subscribe((data) => {
-      this.users = data;
+    this.isLoading = true;
+    this.userService.getAll().subscribe({
+      next: (data) => {
+        this.users = data;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 

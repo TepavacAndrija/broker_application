@@ -5,8 +5,13 @@
   <button class="btn btn-primary mb-3" (click)="startCreate()">
     + New Instrument
   </button>
-  }
-
+  } @if (isLoading) {
+  <div class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading instruments...</span>
+    </div>
+  </div>
+  } @if (!isLoading && instruments && instruments.length > 0) {
   <div class="card shadow-sm">
     <div class="card-body">
       <table class="table table-striped table-hover">
@@ -48,6 +53,11 @@
       </table>
     </div>
   </div>
+  } @if (!isLoading && instruments && instruments.length === 0) {
+  <div class="alert alert-info">
+    No instruments found. Create a new instrument to get started.
+  </div>
+  }
 </div>
 
 @if (editingInstrument) {

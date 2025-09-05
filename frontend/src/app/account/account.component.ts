@@ -19,6 +19,7 @@ export class AccountComponent implements OnInit {
   accounts: AccountDTO[] = [];
   editingAccount: AccountDTO | null = null;
   private client!: Stomp.Client;
+  isLoading: boolean = true;
 
   constructor(
     private accountService: AccountService,
@@ -79,8 +80,15 @@ export class AccountComponent implements OnInit {
   }
 
   loadAccounts(): void {
-    this.accountService.getAll().subscribe((data) => {
-      this.accounts = data;
+    this.isLoading = true;
+    this.accountService.getAll().subscribe({
+      next: (data) => {
+        this.accounts = data;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 

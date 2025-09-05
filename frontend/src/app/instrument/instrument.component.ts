@@ -19,7 +19,7 @@ export class InstrumentComponent implements OnInit {
   instruments: InstrumentDTO[] = [];
   editingInstrument: InstrumentDTO | null = null;
   private client!: Stomp.Client;
-
+  isLoading: boolean = true;
   constructor(
     private instrumentService: InstrumentService,
     private authService: AuthService,
@@ -32,8 +32,15 @@ export class InstrumentComponent implements OnInit {
   }
 
   loadInstruments(): void {
-    this.instrumentService.getAll().subscribe((data) => {
-      this.instruments = data;
+    this.isLoading = true;
+    this.instrumentService.getAll().subscribe({
+      next: (data) => {
+        this.instruments = data;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
     });
   }
 
