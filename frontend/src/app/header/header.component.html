@@ -1,0 +1,85 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom-green shadow-sm py-2">
+  <div class="container-fluid">
+    <a class="navbar-brand" [routerLink]="'/dashboard'">Trading App</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul
+        class="navbar-nav me-auto mb-2 mb-lg-0"
+        *ngIf="authService.isLoggedIn$ | async"
+      >
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="'/dashboard'"
+            routerLinkActive="active"
+            >Dashboard</a
+          >
+        </li>
+
+        @if ((user$ | async)?.role === 'MANAGER') {
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="'/users'" routerLinkActive="active"
+            >Users</a
+          >
+        </li>
+        }
+
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="'/instruments'"
+            routerLinkActive="active"
+            >Instruments</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="'/accounts'"
+            routerLinkActive="active"
+            >Accounts</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [routerLink]="'/account-status'"
+            routerLinkActive="active"
+            >Status</a
+          >
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center ms-auto">
+        @if (authService.isLoggedIn$ | async) {
+        <span class="text-white me-3">
+          <small>
+            Hello, <strong>{{ (user$ | async)?.name }}</strong> ({{
+              authService.getRole()
+            }})
+          </small>
+        </span>
+        <button class="btn btn-outline-light btn-sm" (click)="logout()">
+          Logout
+        </button>
+        } @else {
+        <small class="text-white"
+          >Not registered yet? Contact your manager</small
+        >
+        }
+      </div>
+    </div>
+  </div>
+</nav>

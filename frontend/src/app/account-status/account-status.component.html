@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Account Status</h2>
+
+  <div class="mb-4">
+    <label class="form-label">Select Date</label>
+    <input
+      type="date"
+      class="form-control w-auto"
+      [(ngModel)]="selectedDate"
+      (input)="loadStatuses()"
+    />
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 40%">Account Name</th>
+            <th style="width: 40%">Date</th>
+            <th style="width: 20%">OTE</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (statuses && statuses.length > 0) { @for (status of statuses;
+          track status.accountId) {
+          <tr>
+            <td>
+              <strong>{{ getAccountName(status.accountId) }}</strong>
+            </td>
+            <td>{{ status.date }}</td>
+            <td>
+              <span
+                [class.text-success]="status.ote >= 0"
+                [class.text-danger]="status.ote < 0"
+                [class.font-weight-bold]="true"
+              >
+                {{ status.ote | number : "1.2-2" }}
+              </span>
+            </td>
+          </tr>
+          } } @else {
+          <tr>
+            <td colspan="4" class="text-center text-muted py-3">
+              <em>No data available for selected date</em>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <button class="btn btn-info" (click)="triggerDailyBalance()">
+      <i class="bi bi-calculator me-1"></i> Run Daily Balance Calculation
+    </button>
+  </div>
+</div>

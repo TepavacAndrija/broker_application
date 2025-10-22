@@ -1,0 +1,46 @@
+<div
+  class="d-flex align-items-center justify-content-center min-vh-100 bg-light"
+>
+  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%">
+    <div class="card-body p-4">
+      <h2 class="text-center mb-4 text-primary">Trading App</h2>
+      <p class="text-center text-muted mb-4">Log in to continue</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input
+            type="text"
+            id="username"
+            class="form-control form-control-lg"
+            formControlName="name"
+            placeholder="Unesite korisničko ime"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control form-control-lg"
+            formControlName="password"
+            placeholder="Unesite lozinku"
+          />
+        </div>
+
+        <div class="alert alert-danger" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg w-100"
+          [disabled]="form.invalid"
+        >
+          Log in
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

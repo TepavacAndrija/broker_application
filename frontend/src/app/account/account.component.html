@@ -1,0 +1,110 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Accounts</h2>
+
+  @if (isManager()) {
+  <button class="btn btn-primary mb-3" (click)="startCreate()">
+    + New Account
+  </button>
+  } @if (isLoading) {
+  <div class="d-flex justify-content-center my-5">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Loading accounts...</span>
+    </div>
+  </div>
+  } @if (!isLoading && accounts && accounts.length > 0) {
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 40%">Name</th>
+            <th style="width: 40%">User Info</th>
+            <th style="width: 20%">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (acc of accounts; track acc.id) {
+          <tr>
+            <td>
+              <strong>{{ acc.name }}</strong>
+            </td>
+            <td>{{ acc.userInfo || "-" }}</td>
+            <td>
+              @if (isManager()) {
+              <button
+                class="btn btn-sm btn-outline-primary me-1"
+                (click)="startEdit(acc)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                (click)="deleteAccount(acc.id)"
+              >
+                Delete
+              </button>
+              } @else {
+              <span class="text-muted">No actions</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  } @if (!isLoading && accounts && accounts.length === 0) {
+  <div class="alert alert-info">
+    No accounts found. Create a new account to get started.
+  </div>
+  }
+</div>
+
+@if (editingAccount) {
+<div
+  class="modal fade show d-block"
+  style="background: rgba(0, 0, 0, 0.5)"
+  tabindex="-1"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editingAccount.id ? "Edit" : "Create" }} Account
+        </h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingAccount.name"
+              name="name"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">User Info</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="editingAccount.userInfo"
+              name="userInfo"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveAccount()">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
