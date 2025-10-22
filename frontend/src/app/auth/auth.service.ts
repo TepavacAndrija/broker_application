@@ -29,7 +29,9 @@ export class AuthService {
   public user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {
-    this.checkAuthStatus().subscribe();
+    if (this.hasToken()) {
+      this.checkAuthStatus().subscribe();
+    }
   }
 
   login(name: string, password: string): Observable<AuthDTO> {
@@ -54,8 +56,9 @@ export class AuthService {
   }
 
   private hasToken(): boolean {
-    const auth = localStorage.getItem('auth');
-    return !!auth;
+    // const auth = localStorage.getItem('auth');
+    // return !!auth;
+    return document.cookie.includes('authToken=');
   }
 
   isLoggedIn(): boolean {
@@ -66,8 +69,8 @@ export class AuthService {
     this.http
       .post<AuthDTO>(
         `${environment.apiUrl}/auth/logout`,
-        {},
-        { withCredentials: true }
+        {}
+        // { withCredentials: true }
       )
       .subscribe({
         next: () => {

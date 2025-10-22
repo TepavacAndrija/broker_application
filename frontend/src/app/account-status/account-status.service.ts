@@ -18,7 +18,7 @@ export class AccountStatusService {
     return this.http.get<UpdateAccountStatusDTO[]>(
       `${environment.apiUrl}/account-status/date/${date}`,
       {
-        withCredentials: true,
+        // withCredentials: true,
       }
     );
   }
@@ -30,7 +30,7 @@ export class AccountStatusService {
     return this.http.get<UpdateAccountStatusDTO>(
       `${environment.apiUrl}/account-status/${accountId}/date/${date}`,
       {
-        withCredentials: true,
+        // withCredentials: true,
       }
     );
   }
@@ -39,8 +39,8 @@ export class AccountStatusService {
     this.http
       .post(
         `${environment.apiUrl}/account-status/trigger-daily-balance`,
-        {},
-        { withCredentials: true }
+        {}
+        // { withCredentials: true }
       )
       .subscribe();
   }

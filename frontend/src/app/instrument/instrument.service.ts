@@ -17,38 +17,38 @@ export class InstrumentService {
 
   getAll(): Observable<InstrumentDTO[]> {
     return this.http.get<InstrumentDTO[]>(`${environment.apiUrl}/instruments`, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
 
   create(dto: UpdateInstrumentDTO): Observable<InstrumentDTO> {
     return this.http.post<InstrumentDTO>(
       `${environment.apiUrl}/instruments`,
-      dto,
-      { withCredentials: true }
+      dto
+      // { withCredentials: true }
     );
   }
 
   update(id: string, dto: UpdateInstrumentDTO): Observable<InstrumentDTO> {
     return this.http.put<InstrumentDTO>(
       `${environment.apiUrl}/instruments/${id}`,
-      dto,
-      { withCredentials: true }
+      dto
+      // { withCredentials: true }
     );
   }
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/instruments/${id}`, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
 
   getById(id: string): Observable<InstrumentDTO> {
     return this.http.get<InstrumentDTO>(
-      `${environment.apiUrl}/instruments/${id}`,
-      {
-        withCredentials: true,
-      }
+      `${environment.apiUrl}/instruments/${id}`
+      // {
+      //   withCredentials: true,
+      // }
     );
   }
 }

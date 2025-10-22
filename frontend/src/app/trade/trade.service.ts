@@ -45,13 +45,13 @@ export class TradeService {
 
   getAllTrades(): Observable<TradeDTO[]> {
     return this.http.get<TradeDTO[]>(`${environment.apiUrl}/trades`, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
 
   getTradeById(id: string): Observable<TradeDTO> {
     return this.http.get<TradeDTO>(`${environment.apiUrl}/trades/${id}`, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
 
@@ -89,29 +89,29 @@ export class TradeService {
   update(trade: TradeDTO): Observable<TradeDTO> {
     return this.http.put<TradeDTO>(
       `${environment.apiUrl}/trades/${trade.id}`,
-      trade,
-      { withCredentials: true }
+      trade
+      // { withCredentials: true }
     );
   }
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/trades/${id}`, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
   create(dto: CreateTradeDTO): Observable<TradeDTO> {
     return this.http.post<TradeDTO>(`${environment.apiUrl}/trades`, dto, {
-      withCredentials: true,
+      // withCredentials: true,
     });
   }
 
   exercise(id: string): Observable<void> {
     return this.http.post<void>(
       `${environment.apiUrl}/trades/${id}/exercise`,
-      id,
-      {
-        withCredentials: true,
-      }
+      id
+      // {
+      //   withCredentials: true,
+      // }
     );
   }
 

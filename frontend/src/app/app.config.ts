@@ -5,19 +5,19 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   BrowserAnimationsModule,
   NoopAnimationsModule,
 } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { tokenInterceptor } from './auth/token.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([tokenInterceptor])),
     importProvidersFrom(
       // BrowserAnimationsModule,
       NoopAnimationsModule,
