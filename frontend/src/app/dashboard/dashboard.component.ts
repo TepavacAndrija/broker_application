@@ -13,11 +13,12 @@ import { InstrumentDTO } from '../models/instrument.dto';
 import * as Stomp from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { NotificationService } from '../notification/notification.service';
+import { TradeFormComponent } from '../trade-form/trade-form.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TradeFormComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -183,8 +184,8 @@ export class DashboardComponent implements OnInit {
     this.editingTrade = null;
   }
 
-  createTrade(): void {
-    this.tradeService.create({ ...this.newTrade, status: 'OPEN' }).subscribe({
+  createTrade(tradeData: any): void {
+    this.tradeService.create({ ...tradeData, status: 'OPEN' }).subscribe({
       next: () => {
         this.showCreateModal = false;
         this.newTrade = { ...this.newTrade, quantity: 0, price: 0 };
