@@ -5,6 +5,7 @@ import com.example.BrokerService.model.AccountStatus;
 import com.example.BrokerService.service.AccountStatusService;
 import com.example.BrokerService.service.CreateAccountDTO;
 import com.example.BrokerService.service.CreateAccountStatusDTO;
+import com.example.BrokerService.service.TradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class AccountStatusController {
 
     private final AccountStatusService accountStatusService;
+    private final TradeService tradeService;
 
     @GetMapping("/{accountId}/date/{date}")
     public ResponseEntity<AccountStatus> getStatusByAccountAndDate(
@@ -40,8 +42,11 @@ public class AccountStatusController {
         System.out.println("Datum je="+date + "i svi koji postoje su "+ accountStatusService.getAllByDate(date));
         return ResponseEntity.ok(accountStatusService.getAllByDate(date));
     }
-
-
+    @PostMapping("/trigger-daily-balance")
+    @PreAuthorize("hasRole('MANAGER')")
+    public void triggerDailyBalanceCalculation() {
+        tradeService.triggerDailyBalanceCalculation();
+        }
 //    @PostMapping("/{accountId}/date/{date}/ote")
 //    public ResponseEntity<AccountStatus> updateOTE(
 //            @PathVariable UUID accountId,

@@ -47,7 +47,10 @@ export class AccountStatusComponent implements OnInit {
       },
     });
   }
-
+  triggerDailyBalance() {
+    this.statusService.triggerDailyBalance();
+    this.loadAccounts();
+  }
   getAccountName(accountId: string): string {
     const account = this.accounts.find((a) => a.id === accountId);
     return account?.name || 'Unknown account';

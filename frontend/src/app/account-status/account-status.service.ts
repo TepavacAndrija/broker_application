@@ -34,4 +34,14 @@ export class AccountStatusService {
       }
     );
   }
+
+  triggerDailyBalance(): void {
+    this.http
+      .post(
+        `${environment.apiUrl}/account-status/trigger-daily-balance`,
+        {},
+        { withCredentials: true }
+      )
+      .subscribe();
+  }
 }
